@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Посты с тегом {{ tag.name }}{% endblock title %}
+
+{% block content %}
+    <a href="javascript:history.back()">&larr;Назад ко всем постам</a>
+    <h1>Посты с тегом: #{{ tag.name }}</h1>
+    
+    {% if posts %}
+        {% for post in posts %}
+            {% include 'blog/includes/post_container_include.html' %}
+        {% endfor %}
+    {% else %}
+        <p>С этим тегом пока нет постов.</p>
+    {% endif %}
+{% endblock content %}
