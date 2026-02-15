@@ -30,13 +30,20 @@ export async function getAction(url) {
 }
 
 
-export async function postAction(url) {
-  const response = await fetch(url, {
+export async function postAction(url, formData = null) {
+  const config = {
     method: "POST",
     headers: {
       'X-CSRFToken': getCookie('csrftoken')
     }
-  });
+  };
+
+  // Добавляем body только если передан formData
+  if (formData) {
+    config.body = formData;
+  }
+
+  const response = await fetch(url, config);
 
   if (!response.ok) {
     console.error("Request failed", response.status)

@@ -1,0 +1,13 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+            <h6 class="card-title mb-1">
+                <a href="{% url 'users:profile' comment.author.username %}" class="text-decoration-none">
+                    {{ comment.author.username }}
+                </a>
+            </h6>
+            <small class="text-muted date-field">{{ comment.created_at|date:"c" }}</small>
+        </div>
+        <p class="card-text mt-2">{{ comment.text }}</p>
+    </div>
+</div>

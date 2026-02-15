@@ -7,7 +7,7 @@ from django.db.models import F, Q
 from django.contrib import messages
 from django.template.loader import render_to_string
 
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from .forms import PostForm
 
 
@@ -300,4 +300,31 @@ class PostFavoriteToggleView(View):
         return JsonResponse({
             'is_favorite': is_favorite,
             'favorites_count': post.favorites.count()
+        })
+
+
+class AddCommentView(View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = get_object_or_404(Post, id=post_id)
+        
+        text = request.POST.get('text', '').strip()
+        if not text:
+            return JsonResponse({'success': False, 'error': 'Текст комментария не может быть пустым'})
+        
+        comment = Comment.objects.create(
+            post=post,
+            author=request.user,
+            text=text
+        )
+        
+        comment_html = render_to_string(
+            "blog/includes/comment_container.html", 
+            {"comment": comment}, 
+            request
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'comment_html': comment_html,
+            'comments_count': post.comments.count()
         })

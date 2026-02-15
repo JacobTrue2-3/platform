@@ -67,4 +67,39 @@
         <a href="{% url 'blog:edit_post' post.id %}">Редактировать пост</a>
         <a href="{% url 'blog:remove_post' post.id %}">Удалить пост</a>
     {% endif %}
+
+    <!-- Блок комментариев -->
+    <div class="mt-4">
+        <h4 id="commentsTitle">Комментарии ({{ post.comments.count }})</h4>
+        
+        <!-- Форма добавления комментария -->
+        {% if request.user.is_authenticated %}
+            <form
+                id="commentForm"
+                data-add-comment-url="{% url "blog:add_comment" post.id %}"
+            >
+                {% csrf_token %}
+                
+                <!-- Блок для ошибок -->
+                <div id="commentErrors" class="alert alert-danger d-none"></div>
+                
+                <div class="mb-3">
+                    <textarea name="text" class="form-control" rows="3" placeholder="Оставьте ваш комментарий..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Добавить комментарий</button>
+            </form>
+        {% else %}
+            <p class="text-muted">Чтобы оставить комментарий, <a href="{% url 'users:login' %}">войдите</a> в аккаунт.</p>
+        {% endif %}
+
+        <!-- Список комментариев -->
+        <div id="commentsList" class="mt-3">
+            {% for comment in post.comments.all %}
+                {% include 'blog/includes/comment_container.html' %}
+            {% empty %}
+                <p id="emptyMessage" class="text-muted">Пока нет комментариев. Будьте первым!</p>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Конец блока комментариев -->
 {% endblock content %}
