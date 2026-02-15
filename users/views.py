@@ -8,7 +8,7 @@ def register_view(request):
 
         if form.is_valid():
             form.save()
-            return redirect('post_list')
+            return redirect('blog:post_list')
         else:
             return render(request, 'users/register.html', {'form': form})
 
