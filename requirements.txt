@@ -3,6 +3,7 @@ Django==5.2.2
 django-bootstrap5==25.1
 django-extensions==4.1
 pillow==11.3.0
+python-dotenv==1.1.1
 sqlparse==0.5.3
 tzdata==2025.2
 Unidecode==1.4.0

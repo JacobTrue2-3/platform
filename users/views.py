@@ -48,6 +48,7 @@ class CustomPasswordChangeView(PasswordChangeView):
         messages.success(self.request, 'Пароль успешно изменен!')
         return super().form_valid(form)
 
+
 class PasswordChangeDoneView(TemplateView):
     template_name = 'users/pages/password_change_done.html'
 
