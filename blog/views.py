@@ -1,49 +1,163 @@
+# blog/views.py
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.db.models import F, Q
+from django.db.models import F, Q, Count, Sum
+from django.db.models.functions import Coalesce
 from django.contrib import messages
 from django.template.loader import render_to_string
+from django.contrib.auth import get_user_model
 
 from .models import Post, Category, Tag, Comment
 from .forms import PostForm
+
+User = get_user_model()
 
 
 class PostListView(ListView):
     model = Post
     template_name = 'blog/pages/post_list.html'
     context_object_name = 'posts'
-    posts_per_batch = 4
+    posts_per_batch = 6
+
+    def get_queryset(self):
+        # Базовый queryset
+        queryset = Post.objects.filter(
+            status="published", 
+            news_item__isnull=True
+        )
+        
+        # Фильтрация по параметру filter
+        filter_type = self.request.GET.get('filter', 'all')
+        
+        if filter_type == 'trending':
+            # Посты с наибольшим количеством просмотров
+            queryset = queryset.filter(views__gt=0).order_by('-views', '-created_at')
+        
+        elif filter_type == 'popular':
+            # Самые популярные по добавлениям в избранное
+            queryset = queryset.annotate(
+                favorites_count=Count('favorites')
+            ).order_by('-favorites_count', '-created_at')
+        
+        elif filter_type == 'new':
+            # Самые новые
+            queryset = queryset.order_by('-created_at')
+        
+        elif filter_type == 'following' and self.request.user.is_authenticated:
+            # Посты от авторов, на которых подписан пользователь
+            if hasattr(self.request.user, 'following'):
+                queryset = queryset.filter(
+                    author__in=self.request.user.following.all()
+                ).order_by('-created_at')
+            else:
+                queryset = queryset.order_by('-created_at')
+        
+        else:
+            # Все посты (по умолчанию)
+            queryset = queryset.order_by('-created_at')
+        
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-    
-        posts_query = Post.objects.filter(
+        
+        # Получаем отфильтрованный queryset из get_queryset
+        filtered_posts = self.get_queryset()
+
+        # Основные посты для отображения (с пагинацией)
+        context["posts"] = filtered_posts[:self.posts_per_batch]
+        context["has_more_posts"] = filtered_posts.count() > self.posts_per_batch
+        context["posts_per_batch"] = self.posts_per_batch
+
+        # Получаем все опубликованные посты (для статистики)
+        all_posts = Post.objects.filter(
             status="published", 
             news_item__isnull=True
-        ).order_by('-created_at')
+        )
 
-        context["posts"] = posts_query[:self.posts_per_batch]
-        context["has_more_posts"] = posts_query.count() > self.posts_per_batch
-        context["posts_per_batch"] = self.posts_per_batch
+        # === РАСЧЁТ СТАТИСТИКИ ===
+        
+        # 1. Общее количество постов
+        context["total_posts"] = all_posts.count()
+        
+        # 2. Общее количество авторов (уникальных)
+        context["total_authors"] = User.objects.filter(
+            posts__in=all_posts
+        ).distinct().count()
+        
+        # 3. Общее количество комментариев
+        context["total_comments"] = Comment.objects.filter(
+            post__in=all_posts
+        ).count()
+        
+        # 4. Общее количество добавлений в избранное
+        total_favorites = 0
+        for post in all_posts:
+            total_favorites += post.favorites.count()
+        context["total_favorites"] = total_favorites
+        
+        # 5. Общее количество просмотров
+        context["total_views"] = all_posts.aggregate(
+            total=Coalesce(Sum('views'), 0)
+        )['total']
+        
+        # 6. Общее количество лайков
+        total_likes = 0
+        for post in all_posts:
+            total_likes += post.liked_users.count()
+        context["total_likes"] = total_likes
+        
+        # 7. Для авторизованных пользователей
+        if self.request.user.is_authenticated:
+            context["user_favorites"] = self.request.user.favorite_posts.count()
+            if hasattr(self.request.user, 'following'):
+                context["user_following"] = self.request.user.following.count()
+            else:
+                context["user_following"] = 0
+        else:
+            context["user_favorites"] = 0
+            context["user_following"] = 0
+        
+        # 8. Текущий фильтр
+        context["current_filter"] = self.request.GET.get('filter', 'all')
 
         return context
 
 
 class LoadMorePostsView(View):
     def get(self, request):
-        # from time import sleep
-        # sleep(1)
-
-        offset = int(request.GET.get("offset"))
+        offset = int(request.GET.get("offset", 0))
         posts_per_batch = PostListView.posts_per_batch
-
+        filter_type = request.GET.get('filter', 'all')
+        
+        # Базовый queryset
         posts_query = Post.objects.filter(
             status="published", 
             news_item__isnull=True
-        ).order_by('-created_at')
+        )
+        
+        # Применяем тот же фильтр, что и в PostListView
+        if filter_type == 'trending':
+            posts_query = posts_query.filter(views__gt=0).order_by('-views', '-created_at')
+        elif filter_type == 'popular':
+            posts_query = posts_query.annotate(
+                favorites_count=Count('favorites')
+            ).order_by('-favorites_count', '-created_at')
+        elif filter_type == 'new':
+            posts_query = posts_query.order_by('-created_at')
+        elif filter_type == 'following' and request.user.is_authenticated:
+            if hasattr(request.user, 'following'):
+                posts_query = posts_query.filter(
+                    author__in=request.user.following.all()
+                ).order_by('-created_at')
+            else:
+                posts_query = posts_query.order_by('-created_at')
+        else:
+            posts_query = posts_query.order_by('-created_at')
+
         posts = posts_query[offset:offset + posts_per_batch]
 
         posts_html = ''.join([
@@ -103,7 +217,7 @@ class CategoryPostsView(ListView):
 
     def get_queryset(self):
         self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
-        return Post.objects.filter(category=self.category, status='published')
+        return Post.objects.filter(category=self.category, status='published').order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -124,7 +238,7 @@ class TagPostsView(ListView):
             tags=self.tag, 
             status='published',
             news_item__isnull=True
-        )
+        ).order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -381,7 +495,7 @@ class LoadMoreCommentsView(View):
         # from time import sleep
         # sleep(0.5)
 
-        offset = int(request.GET.get("offset"))
+        offset = int(request.GET.get("offset", 0))
         comments_per_batch = PostDetailView.comments_per_batch
 
         post = get_object_or_404(Post, id=post_id)
