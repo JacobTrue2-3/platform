@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+from django.db.models import F
 
 from .models import Post, Category, Tag
 from .forms import PostForm
@@ -55,6 +56,20 @@ class PostDetailView(DetailView):
     # context_object_name = 'post' Необязательно
     slug_url_kwarg = 'post_slug'
     slug_field = 'slug' # Необязательно
+
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset)
+
+        session_key = f'post_{post.id}_viewed'
+
+        if not self.request.session.get(session_key, False):
+            Post.objects.filter(id=post.id).update(views=F("views") + 1)
+
+            post.views = post.views + 1
+
+            self.request.session[session_key] = True
+
+        return post
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
