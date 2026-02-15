@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
 from .models import Post, Category, Tag
 from .forms import PostForm
@@ -104,15 +105,12 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
         return redirect('blog:post_detail', post_slug=self.object.slug)
 
 
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-
-    if request.method == "POST":
-        post.delete()
-
-        return redirect("blog:post_list")
-    
-    return render(request, 'blog/confirm_post_delete.html', {'post': post})
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    pk_url_kwarg = 'post_id'
+    template_name = 'blog/confirm_post_delete.html'
+    # context_object_name = 'post'
+    success_url = reverse_lazy('blog:post_list')
 
 
 def main_page_view(request):
