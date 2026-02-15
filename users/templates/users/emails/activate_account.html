@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px 10px 0 0;
+      }
+
+      .content {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 0 0 10px 10px;
+      }
+
+      .button {
+        display: inline-block;
+        background: #28a745;
+        color: white !important;
+        padding: 12px 30px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin: 20px 0;
+      }
+
+      .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #dee2e6;
+        font-size: 14px;
+        color: #6c757d;
+      }
+
+      .code-block {
+        background: #e9ecef;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        word-break: break-all;
+        font-family: monospace;
+      }
+
+      .welcome-icon {
+        font-size: 48px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <div class="welcome-icon">🎉</div>
+      <h1>Добро пожаловать на {{ site_name }}!</h1>
+    </div>
+
+    <div class="content">
+      <p>Здравствуйте!</p>
+
+      <p>Мы рады приветствовать вас в нашем сообществе <strong>{{ site_name }}</strong>!</p>
+
+      <p>Для завершения регистрации и активации вашего аккаунта нажмите на кнопку ниже:</p>
+
+      <div style="text-align: center;">
+        <a href="{{ activation_url }}" class="button">
+          Активировать аккаунт
+        </a>
+      </div>
+
+      <p>Если кнопка не работает, скопируйте и вставьте следующую ссылку в адресную строку браузера:</p>
+
+      <div class="code-block">
+        {{ activation_url }}
+      </div>
+
+      <p><strong>Срок действия ссылки:</strong> 24 часа</p>
+
+      <div class="footer">
+        <p>Если вы не регистрировались на нашем сайте, просто проигнорируйте это письмо.</p>
+
+        <p>С уважением,<br>
+          Команда <strong>{{ site_name }}</strong></p>
+
+        <p style="font-size: 12px; color: #868e96;">
+          Это автоматическое письмо, пожалуйста, не отвечайте на него.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
