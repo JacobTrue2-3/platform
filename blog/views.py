@@ -35,3 +35,21 @@ def create_post(request):
             return redirect('post_detail', post_id=post.id)
         else:
             return render(request, 'blog/post_add.html', context={"form": form})
+
+
+def update_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+
+        if form.is_valid():
+            updated_post = form.save()
+
+            return redirect("post_detail", post_id=updated_post.id)
+        else:
+            return render(request, 'blog/post_update.html', context={"form": form})
+
+    form = PostForm(instance=post)
+
+    return render(request, 'blog/post_update.html', context={"form": form})

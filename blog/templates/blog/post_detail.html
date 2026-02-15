@@ -9,4 +9,6 @@
     <h3>{{ post.title }}</h3>
     <p>{{ post.text }}</p>
     <p>{{ post.created_at }}</p>
+
+    <a href="{% url 'edit_post' post.id %}">Редактировать пост</a>
 {% endblock content %}

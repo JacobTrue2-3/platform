@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать пост{% endblock title %}
+
+{% block content %}
+    <h1>Редактировать пост</h1>
+
+    {% comment %} action="{% url 'edit_post' %}" можно не указывать {% endcomment %}
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div>
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
+
+        <div>
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {{ form.text.errors }}
+        </div>
+
+        <button type="submit">Сохранить</button>
+    </form>
+{% endblock content %}
