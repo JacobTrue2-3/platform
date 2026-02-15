@@ -7,12 +7,23 @@
     <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
 {% endblock styles %}
 
+{% block scripts %}
+    <script src="{% static "blog/js/pages/post_list.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
 {% block content %}
     <h1>Список постов сайта</h1>
 
     {# Отображение постов #}
     {% if posts %}
-        <div class="container">
+        <div
+            id="postsContainer"
+            class="container"
+            data-initial-offset="{{ posts|length }}"
+            data-has-more="{{ has_more_posts }}"
+            data-batch-size="{{ posts_per_batch }}"
+            data-load-more-url="{% url 'blog:load_more_posts' %}"
+        >
             {% for post in posts %}
                 {% include 'blog/includes/post_container.html' %}
             {% endfor %}
@@ -21,5 +32,11 @@
         <p>Постов ещё нет. Загляните позже!</p>
     {% endif %}
 
-    {% include "blog/includes/pagination.html" %}
+    {% if has_more_posts %}
+        <div id="loadingSpinner" class="text-center d-none">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+        </div>
+    {% endif %}
 {% endblock content %}

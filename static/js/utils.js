@@ -18,6 +18,18 @@ function getCookie(cookieKey) {
 }
 
 
+export async function getAction(url) {
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    console.error("Request failed", response.status);
+    return null;
+  }
+
+  return await response.json();
+}
+
+
 export async function postAction(url) {
   const response = await fetch(url, {
     method: "POST",

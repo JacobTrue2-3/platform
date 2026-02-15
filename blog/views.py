@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import F, Q
 from django.contrib import messages
+from django.template.loader import render_to_string
 
 from .models import Post, Category, Tag
 from .forms import PostForm
@@ -14,8 +15,38 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/pages/post_list.html'
     context_object_name = 'posts'
-    queryset = Post.objects.filter(status="published").order_by('-created_at')
-    paginate_by = 5
+    posts_per_batch = 4
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+    
+        posts_query = Post.objects.filter(status="published").order_by('-created_at')
+
+        context["posts"] = posts_query[:self.posts_per_batch]
+        context["has_more_posts"] = posts_query.count() > self.posts_per_batch
+        context["posts_per_batch"] = self.posts_per_batch
+
+        return context
+
+
+class LoadMorePostsView(View):
+    def get(self, request):
+        offset = int(request.GET.get("offset"))
+        posts_per_batch = PostListView.posts_per_batch
+
+        posts_query = Post.objects.filter(status="published").order_by('-created_at')
+        posts = posts_query[offset:offset + posts_per_batch]
+
+        posts_html = ''.join([
+            render_to_string("blog/includes/post_container.html", {"post": post}, request)
+            for post in posts
+        ])
+        has_more_posts = offset + posts_per_batch < posts_query.count()
+
+        return JsonResponse({
+            'html': posts_html,
+            'has_more': has_more_posts
+        })
 
 
 class PostSearchView(ListView):
