@@ -53,5 +53,8 @@ jobs:
             echo "FIREBASE_API_KEY=${{ secrets.ENV_FIREBASE_API_KEY }}" >> .env
 
 
-            # Перезапускаем systemd сервис
-            sudo systemctl restart Pikabu-E-python521
+            # Собираем статику
+            python manage.py collectstatic --noinput
+
+            # Перезапускаем gunicorn
+            sudo systemctl restart Pikabu-E-python521-gunicorn
