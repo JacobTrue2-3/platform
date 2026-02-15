@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
-from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView, PasswordResetView
 from django.views.generic.list import MultipleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -51,6 +51,22 @@ class CustomPasswordChangeView(PasswordChangeView):
 
 class PasswordChangeDoneView(TemplateView):
     template_name = 'users/pages/password_change_done.html'
+
+
+class ProfilePasswordResetView(PasswordResetView):
+    template_name="users/pages/password_reset_profile.html"
+    email_template_name='users/emails/password_reset.txt',
+    html_email_template_name='users/emails/password_reset.html',
+    subject_template_name='users/emails/subjects/password_reset.txt'
+    success_url=reverse_lazy("users:profile_password_reset_instructions_sent")
+
+    def post(self, request, *args, **kwargs):
+        request.POST = request.POST.copy()
+        request.POST['email'] = request.user.email
+
+        messages.success(request, f'Письмо отправлено на {request.user.email}')
+
+        return super().post(request, *args, **kwargs)
 
 
 @require_POST
