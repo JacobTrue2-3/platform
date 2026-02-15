@@ -1,6 +1,11 @@
 {% extends "layouts/base.html" %}
+{% load static %}
 
 {% block title %}Профиль{% endblock title %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
 
 {% block content %}
     {% if user == request.user %}
