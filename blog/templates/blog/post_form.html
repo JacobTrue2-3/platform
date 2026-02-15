@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Создать пост{% endblock title %}
+{% block title %}{{ title }}{% endblock title %}
 
 {% block content %}
-    <h1>Создать новый пост</h1>
+    <h1>{{ title }}</h1>
 
-    {% comment %} action="{% url 'new_post' %}" можно не указывать {% endcomment %}
+    {% comment %} action="{% url '' %}" можно не указывать {% endcomment %}
     <form method="POST">
         {% csrf_token %}
         
@@ -21,6 +21,6 @@
             {{ form.text.errors }}
         </div>
 
-        <button type="submit">Создать</button>
+        <button type="submit">{{ submit_button_text }}</button>
     </form>
 {% endblock content %}
