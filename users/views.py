@@ -14,13 +14,13 @@ User = get_user_model()
 
 
 class RegisterView(CreateView):
-    template_name = 'users/register.html'
+    template_name = 'users/pages/register.html'
     form_class = UserCreationForm
     success_url = reverse_lazy('users:login')
 
 
 class CustomLoginView(LoginView):
-    template_name = 'users/login.html'
+    template_name = 'users/pages/login.html'
     authentication_form = CustomAuthenticationForm
 
     def get_success_url(self):
@@ -41,7 +41,7 @@ class CustomLogoutView(LogoutView):
 
 class ProfileView(DetailView, MultipleObjectMixin):
     model = User
-    template_name = 'users/profile.html'
+    template_name = 'users/pages/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'user_username'
     # context_object_name = 'user' Необязательно

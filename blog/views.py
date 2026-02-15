@@ -12,7 +12,7 @@ from .forms import PostForm
 
 class PostListView(ListView):
     model = Post
-    template_name = 'blog/post_list.html'
+    template_name = 'blog/pages/post_list.html'
     context_object_name = 'posts'
     queryset = Post.objects.filter(status="published").order_by('-created_at')
     paginate_by = 5
@@ -20,7 +20,7 @@ class PostListView(ListView):
 
 class PostSearchView(ListView):
     model = Post
-    template_name = "blog/post_search.html"
+    template_name = "blog/pages/post_search.html"
     context_object_name = 'posts'
     paginate_by = 3
 
@@ -55,7 +55,7 @@ class PostSearchView(ListView):
 
 class CategoryPostsView(ListView):
     model = Post
-    template_name = 'blog/category_posts.html'
+    template_name = 'blog/pages/category_posts.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
@@ -72,7 +72,7 @@ class CategoryPostsView(ListView):
 
 class TagPostsView(ListView):
     model = Post
-    template_name = 'blog/tag_posts.html'
+    template_name = 'blog/pages/tag_posts.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
@@ -89,7 +89,7 @@ class TagPostsView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'blog/post_detail.html'
+    template_name = 'blog/pages/post_detail.html'
     # context_object_name = 'post' Необязательно
     slug_url_kwarg = 'post_slug'
     slug_field = 'slug' # Необязательно
@@ -135,7 +135,7 @@ class PostDetailView(DetailView):
 class CreatePostView(LoginRequiredMixin, CreateView):
     # model = Post Необязательно
     form_class = PostForm
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/pages/post_form.html'
     extra_context = {
         'title': "Создать пост",
         'submit_button_text': "Создать"
@@ -159,7 +159,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
 class PostUpdateView(LoginRequiredMixin, UpdateView):
     model = Post
     form_class = PostForm
-    template_name = 'blog/post_form.html'
+    template_name = 'blog/pages/post_form.html'
     pk_url_kwarg = 'post_id'  # потому что в url <int:post_id>, а не <int:id>
 
     def get_context_data(self, **kwargs):
@@ -186,13 +186,13 @@ class PostUpdateView(LoginRequiredMixin, UpdateView):
 class PostDeleteView(LoginRequiredMixin, DeleteView):
     model = Post
     pk_url_kwarg = 'post_id'
-    template_name = 'blog/confirm_post_delete.html'
+    template_name = 'blog/pages/confirm_post_delete.html'
     # context_object_name = 'post'
     success_url = reverse_lazy('blog:post_list')
 
 
 class MainPageView(TemplateView):
-    template_name = 'blog/main_page.html'
+    template_name = 'blog/pages/main_page.html'
 
 
 class PostLikeToggleView(View):
