@@ -44,13 +44,11 @@
             <i class="bi bi-shield-lock me-2"></i>Сменить пароль
           </a>
         </li>
-        {% endif %}
         <li>
           <a href="#" class="coming-soon">
             <i class="bi bi-gear me-2"></i>Настройки
           </a>
         </li>
-        {% if user == request.user %}
         <li>
           <form method="POST" action="{% url 'users:logout' %}" class="nav-link-form">
             {% csrf_token %}
