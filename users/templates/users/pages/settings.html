@@ -8,6 +8,15 @@
   <link rel="stylesheet" href="{% static "users/css/pages/settings.css" %}">
 {% endblock styles %}
 
+{% block scripts %}
+<script>
+  window.FIREBASE_API_KEY = "{{ FIREBASE_API_KEY }}";
+  window.USER_PHONE_NUMBER = "{{ user.phone_number }}";
+  window.MARK_PHONE_NUMBER_AS_VERIFIED_URL = "{% url 'users:mark_phone_number_as_verified' %}";
+</script>
+<script src="{% static 'users/js/phone-number-verification.js' %}" type="module" defer></script>
+{% endblock scripts %}
+
 {% block profile_content %}
 <div class="row">
   <div class="col-12">
@@ -67,5 +76,65 @@
       </div>
     </div>
   </div>
+
+  <!-- Номер телефона -->
+  <div class="col-md-6 mb-4 mx-auto">
+    <div class="card h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-center align-items-center mb-2">
+          <div class="icon-wrapper bg-info text-white rounded-circle me-3">
+            <i class="bi bi-telephone-fill"></i>
+          </div>
+          <h5 class="card-title mb-0">Номер телефона</h5>
+        </div>
+
+        <div class="phone-content">
+          {% if user.phone_number %}
+            <div class="d-flex align-items-center justify-content-center mb-3">
+              <div class="d-flex flex-column align-items-center">
+                <p class="card-text mb-1 fs-4"><strong>{{ user.phone_number }}</strong></p>
+                {% if user.phone_number_verified %}
+                  <span class="badge bg-success">
+                    <i class="bi bi-check-circle me-1"></i>Подтверждён
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">
+                    <i class="bi bi-exclamation-circle me-1"></i>Не подтверждён
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+
+
+            <div class="btn-group w-100" role="group">
+              {% if not user.phone_number_verified %}
+                <button class="btn btn-danger flex-fill me-1" data-bs-toggle="modal" data-bs-target="#verifyPhoneNumberModal">
+                  <i class="bi bi-shield-check me-2"></i>Подтвердить
+                </button>
+              {% endif %}
+              <button class="btn btn-outline-primary flex-fill" data-bs-toggle="modal" data-bs-target="#setPhoneNumberModal">
+                <i class="bi bi-pencil me-2"></i>Изменить
+              </button>
+            </div>
+
+
+          {% else %}
+            <div class="text-center py-3">
+              <i class="bi bi-telephone-x text-muted fs-2"></i>
+              <p class="text-muted mt-2 mb-3">Номер телефона не указан</p>
+
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#setPhoneNumberModal">
+                <i class="bi bi-plus-circle me-2"></i>Добавить номер
+              </button>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Модальные окна -->
+{% include "users/includes/set_phone_number_modal.html" %}
+{% include "users/includes/verify_phone_number_modal.html" %}
 {% endblock profile_content %}

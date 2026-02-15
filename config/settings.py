@@ -157,3 +157,6 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL')
 
 # URL сайта
 SITE_URL = 'http://127.0.0.1:8000' # нужно будет внести изменения при DEBUG = False
+
+# Ключ доступа к firebase приложению
+FIREBASE_API_KEY = os.getenv('FIREBASE_API_KEY')
