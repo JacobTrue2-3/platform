@@ -61,6 +61,8 @@ def create_post(request):
 
             post.save()
 
+            form.save_m2m()
+
             return redirect('blog:post_detail', post_slug=post.slug)
         else:
             return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
