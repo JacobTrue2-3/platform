@@ -28,8 +28,8 @@
     {% endif %}
 
     <p>{{ post.text }}</p>
-    <p>Дата создания поста: {{ post.created_at }}</p>
-    <p>Дата последнего изменения поста: {{ post.updated_at }}</p>
+    <p>Дата создания поста: <span class="date-field">{{ post.created_at|date:"c" }}<span></p>
+    <p>Дата последнего изменения поста: <span class="date-field">{{ post.updated_at|date:"c" }}<span></p>
 
     <p>Автор поста: <a href="{% url "users:profile" user_username=post.author.username %}">{{ post.author }}</a></p>
 

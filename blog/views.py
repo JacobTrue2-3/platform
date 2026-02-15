@@ -57,7 +57,7 @@ class PostDetailView(DetailView):
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
-    model = Post
+    # model = Post Необязательно
     form_class = PostForm
     template_name = 'blog/post_form.html'
     extra_context = {

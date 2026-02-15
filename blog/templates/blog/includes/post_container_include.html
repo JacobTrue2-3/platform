@@ -11,5 +11,5 @@
     </p>
     
     <p>Текст поста: {{ post.text }}</p>
-    <small>Дата создания поста: {{ post.created_at|date:"d.m.Y H:i" }}</small>
+    <small>Дата создания поста: <span class="date-field">{{ post.created_at|date:"c" }}<span></small>
 </div>
