@@ -1,0 +1,388 @@
+Полезные команды:
+python --version
+pwd
+mkdir название_папки
+rmdir название_папки (не удалит папку с содержимым)
+rm название_файла
+rm -rf название_папки (удалить папку с содержимым)
+cat название_файла
+ls
+ls -a
+cd название_папки/
+cd ~
+cd ../
+cd / (абсолютный путь)
+history, !номер_команды_в_истории, стрелочки вверх/вниз
+ssh имя_пользователя@77.232.139.86
+clear
+reboot (право имеет только sudo)
+exit (отключиться от сервера)
+sudo systemctl daemon-reload (перечитай все конфиги сервисов, я их изменил)
+sudo systemctl stop название_сервиса
+sudo systemctl restart название_сервиса
+sudo systemctl disable название_сервиса (убрать из автозапуска)
+sudo systemctl status название_сервиса
+sudo journalctl -u название_сервиса -f (показывает все логи для указанного сервиса, -u (unit) - сервис, -f (follow) - отслеживать логи в реальном времени)
+
+
+Деплой. Django (Монолит). Последовательный вариант.
+1. Debug=True, Django.
+sudo apt update (проверить наличие обновлений пакетов системы)
+sudo apt upgrade -y (установить последние обновления пакетов системы, -y - соглашаемся на всё)
+
+
+// Установить python, python-pip, python-venv (Последние версии)
+
+
+sudo adduser имя_пользователя (его группа будет называться так же)
+su - имя_пользователя (переключиться на пользователя, например, root)
+
+
+git clone ссылка_на_реп (или создать папку и в ней - git clone ссылка_на_реп .)
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python manage.py makemigrations
+python manage.py migrate
+cp .env.example .env (или nano .env) # создаём .env файл
+nano .env # заполняем
+
+
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'ip-адрес'] # в settings.py
+
+python manage.py runserver 0.0.0.0:8000
+http://ip-адрес:8000/ # перейти и проверить
+
+nohup python manage.py runserver 0.0.0.0:8000 & (
+  & - запустить команду в фоне и сразу вернуть управление терминалом
+  сервер django будет работать даже если закрою терминал, но если выключить (перезагрузить) арендованный пк, то всё
+)
+kill PID (PID, например, 33385) и удалить файл nohup.out
+
+# можно создать суперпользователя django
+# можно посмотреть сценарий: push (на моём пк) -> GitHub -> pull (на арендованном пк) и наоборот
+
+
+
+
+# Чтобы всё работало даже если выключить (перезагрузить) арендованный пк:
+nano /etc/systemd/system/название_сервиса.service (право имеет только sudo)
+
+[Unit]
+Description=Описание Сервиса
+After=network.target (запустить после подключения к сети)
+
+[Service]
+User=имя_пользователя (не root)
+Group=группа_пользователя
+ExecStart=/home/имя_пользователя/репозиторий/venv/bin/python /home/имя_пользователя/репозиторий/manage.py runserver 0.0.0.0:8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target (запустить когда система готова к работе с несколькими пользователями)
+
+sudo systemctl start название_сервиса
+sudo systemctl enable название_сервиса (добавить в автозапуск)
+
+
+
+
+# Автоматический деплой:
+# создаём секреты на GitHub:
+UBUNTU_HOST - ip-адрес
+UBUNTU_USER - имя_пользователя_ubuntu (не root)
+UBUNTU_PASSWORD - пароль_пользователя_ubuntu
+# добавляем данные из .env с префиксом ENV_
+
+
+cd /home/имя_пользователя/репозиторий
+git remote set-url origin https://имя_пользователя_github:токен_github@github.com/имя_пользователя_github/репозиторий_github.git (
+  нужно сделать если репозиторий приватный
+  чтоб не просил данные (имя пользователя и токен) при git pull
+)
+
+
+visudo (право имеет только sudo)
+# добавляем в конец файла:
+имя_пользователя ALL=(root) NOPASSWD: /usr/bin/systemctl restart название_сервиса (имя_пользователя - того которому даём право)
+# проверяем:
+su - имя_пользователя
+sudo systemctl restart название_сервиса (не будет запрашивать пароль)
+
+
+.github/workflows/название_файла.yml (например deploy.yml или yaml)
+# Название нашего workflow для отображения в интерфейсе GitHub
+name: Название workflow
+
+# Указываем когда запускать - при push в main ветку
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Деплоим на сервер, подключаемся через SSH
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          # Используем секреты из GitHub для подключения
+          host: ${{ secrets.UBUNTU_HOST }}
+          username: ${{ secrets.UBUNTU_USERNAME }}
+          password: ${{ secrets.UBUNTU_PASSWORD }}
+
+          # Команды выполняемые на сервере
+          script: |
+            # Переходим в директорию проекта
+            cd /home/имя_пользователя/репозиторий
+
+            # Обновляем код из репозитория
+            git pull
+
+            # Активируем виртуальное окружение
+            source venv/bin/activate
+
+            # Обновляем зависимости
+            pip install -r requirements.txt
+
+            # Создаём и применяем миграции
+            python manage.py makemigrations
+            python manage.py migrate
+
+            # Создаём файл .env из отдельных секретов
+            echo "КЛЮЧ=${{ secrets.ENV_КЛЮЧ }}" > .env
+            echo "КЛЮЧ=${{ secrets.ENV_КЛЮЧ }}" >> .env
+
+            # Перезапускаем systemd сервис
+            sudo systemctl restart название_сервиса
+
+
+
+2. Debug=False, Nginx и Gunicorn.
+pip install gunicorn (только на ubuntu-сервере)
+
+
+# в settings.py вносим изменения:
+DEBUG = False
+
+if DEBUG:
+  STATICFILES_DIRS = [BASE_DIR / 'static/']
+else:
+  STATIC_ROOT = '/home/имя_пользователя/репозиторий/static'
+
+if DEBUG:
+  MEDIA_ROOT = BASE_DIR / 'media/'
+else:
+  MEDIA_ROOT = '/home/имя_пользователя/репозиторий/media' (папка media на ubuntu-сервере появиться сама)
+
+
+# создаём gunicorn-сервис
+nano /etc/systemd/system/название_сервиса.service (право имеет только sudo)
+[Unit]
+Description=Описание Сервиса
+After=network.target
+
+[Service]
+User=имя_пользователя (не root) # ОТСЮДААА
+Group=www-data
+WorkingDirectory=/home/python521user/Pikabu-E-python521
+ExecStart=/home/python521user/Pikabu-E-python521/venv/bin/gunicorn --workers 3 --bind unix:/home/python521user/Pikabu-E-python521/gunicorn.sock config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+(workers = 2 × CPU_cores + 1)
+
+systemctl disable Pikabu-E-python521
+systemctl stop Pikabu-E-python521
+systemctl enable Pikabu-E-python521-gunicorn
+systemctl start Pikabu-E-python521-gunicorn
+
+
+
+sudo apt install nginx
+nano /etc/nginx/sites-available/Pikabu-E-521
+
+server {
+  listen 80;
+  server_name 77.232.139.86;
+
+  location = /favicon.ico {
+    access_log off;
+    log_not_found off;
+  }
+
+  location /static/ {
+    root /home/python521user/Pikabu-E-python521;
+  }
+
+  location /media/ {
+    root /home/python521user/Pikabu-E-python521;
+  }
+
+  location / {
+    include proxy_params;
+    proxy_pass http://unix:/home/python521user/Pikabu-E-python521/gunicorn.sock;
+  }
+}
+
+sudo ln -s /etc/nginx/sites-available/Pikabu-E-521 /etc/nginx/sites-enabled/ (Создание символической ссылки)
+nginx -t (проверить конфигурацию nginx)
+systemctl restart nginx
+
+http://77.232.139.86/ перейти посмотреть (
+  не работает из-за: 
+  1) Статика не собрана
+  2) Настройки пуш не сделали
+  3) nginx не может через www-data получить доступ к сокету
+)
+
+
+
+visudo (право имеет только sudo)
+# удаляем:
+python521user ALL=(root) NOPASSWD: /usr/bin/systemctl restart Pikabu-E-python521
+
+# добавляем:
+python521user ALL=(root) NOPASSWD: /usr/bin/systemctl restart Pikabu-E-python521-gunicorn (имя_пользователя - того которому даём право)
+
+# проверяем:
+su - имя_пользователя
+sudo systemctl restart Pikabu-E-python521-gunicorn (не будет запрашивать пароль)
+
+
+
+Удаляем из deploy файла:
+# Перезапускаем systemd сервис
+sudo systemctl restart Pikabu-E-python521
+
+Добавляем в deploy файл:
+# Собираем статику
+python manage.py collectstatic --noinput
+
+# Перезапускаем gunicorn
+sudo systemctl restart Pikabu-E-python521-gunicorn
+
+
+
+
+делаем push deploy.yml и settings.py
+
+
+
+/////////////////////////////////////////////////
+Untracked files: (git status НА СЕРВЕРЕ)
+  (use "git add <file>..." to include in what will be committed)
+        static/admin/
+        static/blog/
+        static/django_extensions/
+        static/users/
+
+nothing added to commit but untracked files present (use "git add" to track)
+/////////////////////////////////////////////////
+
+
+(
+  systemctl status Pikabu-E-python521-gunicorn
+
+  sudo tail -f /var/log/nginx/error.log (www-data не может войти в репозиторий наш)
+  ls -la /home/python521user/Pikabu-E-python521/gunicorn.sock (право было только у python521user)
+  ls -ld /home/python521user/  (право было только у python521user)
+  ls -ld /home/python521user/Pikabu-E-python521/  (право было только у python521user)
+  sudo -u www-data ls -la /home/python521user/Pikabu-E-python521/gunicorn.sock   (право было только у python521user)
+)
+
+sudo chmod 755 /home/python521user  (НЕ СОВСЕМ ВЕРНОЕ РЕШЕНИЕ ДАТЬ ВСЕМ ПРАВО)
+
+sudo systemctl restart Pikabu-E-python521-gunicorn
+sudo systemctl restart nginx
+
+
+
+
+купить домен (подождать пока зарегают)
+привязать к ip нашего сайта (опять подождать)
+
+nano /etc/nginx/sites-available/Pikabu-E-521
+server_name insiders-crys.ru www.insiders-crys.ru 77.232.139.86;
+systemctl restart nginx
+перейти insiders-crys.ru и проверить
+
+
+ALLOWED_HOSTS = [..., 'insiders-crys.ru', 'www.insiders-crys.ru'] (без этого работает вроде, но потом с postgres бд была проблема)
+
+
+
+http -> https:
+БЕЗ HTTPS нельзя платежку подключится и при переходе на сайт можно заразиться неизлечимой болезнью)
+sudo apt install snapd (Snap-версия certbot не зависит от версии Python)
+
+sudo snap install --classic certbot (установим certbot через snap)
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+sudo certbot --nginx -d insiders-crys.ru -d www.insiders-crys.ru (получим сертификат)
+
+Теперь сайт доступен по HTTPS с валидным сертификатом
+Certbot автоматически:
+Проверит владение доменом
+Получит сертификат
+Обновит конфиг Nginx
+Настроит перенаправление с HTTP на HTTPS
+Добавит автопродление сертификата:
+Сертификаты Lets Encrypt действуют 90 дней, но certbot создаст задачу в cron для автоматического обновления.
+
+
+
+
+
+POSTGRES БД
+На сервере:
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+
+sudo -u postgres psql (войти под польз. postgres)    ПАРОЛЬ УСТАНОВИТЬ
+CREATE DATABASE pikabu_e_python521;
+CREATE USER python521user WITH PASSWORD 'gbnjy521.pth';
+ALTER DATABASE pikabu_e_python521 SET client_encoding TO 'utf8';
+ALTER DATABASE pikabu_e_python521 SET default_transaction_isolation TO 'read committed';
+ALTER DATABASE pikabu_e_python521 SET timezone TO 'UTC';
+\c pikabu_e_python521
+GRANT ALL ON SCHEMA public TO python521user;
+
+
+Локально:
+pip install psycopg2-binary
+pip freeze > requirements.txt
+
+settings.py
+DATABASES = {
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': os.getenv('DB_NAME'),
+    'USER': os.getenv('DB_USER'),
+    'PASSWORD': os.getenv('DB_PASSWORD'),
+    'HOST': os.getenv('DB_HOST'),
+    'PORT': os.getenv('DB_PORT')
+  }
+}
+
+# .env заполнить
+
+deploy.yml (и секреты создать на гитхаб - UBUNTU_)
+echo "DB_NAME=${{ secrets.UBUNTU_DB_NAME }}" >> .env
+echo "DB_USER=${{ secrets.UBUNTU_DB_USER }}" >> .env
+echo "DB_PASSWORD=${{ secrets.UBUNTU_DB_PASSWORD }}" >> .env
+echo "DB_HOST=${{ secrets.UBUNTU_DB_HOST }}" >> .env
+echo "DB_PORT=${{ secrets.UBUNTU_DB_PORT }}" >> .env
+
+
+# сделать push
+На сервере:
+python manage.py migrate
+rm db.sqlite3
+
+"ЕСЛИ ЧТО МОЖНО:"
+sudo systemctl restart Pikabu-E-python521-gunicorn
