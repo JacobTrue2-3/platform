@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ post.title }}{% endblock title %}
+
+{% block scripts %}
+    <script src="{% static "blog/js/reactions.js" %}" type="module" defer></script>
+{% endblock scripts %}
 
 {% block content %}
     <a href="{% url 'blog:post_list' %}">&larr;Назад</a>
@@ -30,6 +35,28 @@
     <p>{{ post.text }}</p>
     <p>Дата создания поста: <span class="date-field">{{ post.created_at|date:"c" }}<span></p>
     <p>Дата последнего изменения поста: <span class="date-field">{{ post.updated_at|date:"c" }}<span></p>
+
+    <div id="postReactions" 
+        data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+        data-login-url="{% url 'users:login' %}">
+        <button
+            id='likeBtn'
+            class="btn btn-sm {% if is_liked %}btn-primary{% else %}btn-outline-primary{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
+            data-url="{% url "blog:post_like" post.id %}"
+        >
+            <i class="bi bi-hand-thumbs-up{% if is_liked %}-fill{% endif %}"></i>
+            <span id="likesCount">{{ likes_count }}</span>
+        </button>
+
+        <button
+            id='dislikeBtn'
+            class="btn btn-sm {% if is_disliked %}btn-danger{% else %}btn-outline-danger{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
+            data-url="{% url "blog:post_dislike" post.id %}"
+        >
+            <i class="bi bi-hand-thumbs-down{% if is_disliked %}-fill{% endif %}"></i>
+            <span id="dislikesCount">{{ dislikes_count }}</span>
+        </button>
+    </div>
 
     <p>
         Автор поста: <a href="{% url "users:profile" user_username=post.author.username %}">{{ post.author }}</a>

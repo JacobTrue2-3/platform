@@ -1,5 +1,6 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import View, ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.db.models import F, Q
@@ -110,6 +111,24 @@ class PostDetailView(DetailView):
                 post.viewed_users.add(user)
 
         return post
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        user = self.request.user
+        post = self.object
+
+        context['is_liked'] = False
+        context['is_disliked'] = False
+        
+        if user.is_authenticated:
+            context['is_liked'] = post.liked_users.filter(id=user.id).exists()
+            context['is_disliked'] = post.disliked_users.filter(id=user.id).exists()
+
+        context['likes_count'] = post.liked_users.count()
+        context['dislikes_count'] = post.disliked_users.count()
+
+        return context
 
 
 class CreatePostView(LoginRequiredMixin, CreateView):
@@ -171,3 +190,63 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
 class MainPageView(TemplateView):
     template_name = 'blog/main_page.html'
+
+
+class PostLikeToggleView(View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        has_liked = post.liked_users.filter(id=user.id).exists()
+        has_disliked = post.disliked_users.filter(id=user.id).exists()
+
+        if has_liked:
+            post.liked_users.remove(user)
+            has_liked = False
+        else:
+            post.liked_users.add(user)
+            has_liked = True
+
+            if has_disliked:
+                post.disliked_users.remove(user)
+                has_disliked = False
+
+        likes_count = post.liked_users.count()
+        dislikes_count = post.disliked_users.count()
+
+        return JsonResponse({
+            'likes_count': likes_count,
+            'dislikes_count': dislikes_count,
+            'has_liked': has_liked,
+            'has_disliked': has_disliked
+        })
+
+
+class PostDislikeToggleView(View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        has_disliked = post.disliked_users.filter(id=user.id).exists()
+        has_liked = post.liked_users.filter(id=user.id).exists()
+
+        if has_disliked:
+            post.disliked_users.remove(user)
+            has_disliked = False
+        else:
+            post.disliked_users.add(user)
+            has_disliked = True
+
+            if has_liked:
+                post.liked_users.remove(user)
+                has_liked = False
+
+        dislikes_count = post.disliked_users.count()
+        likes_count = post.liked_users.count()
+
+        return JsonResponse({
+            'dislikes_count': dislikes_count,
+            'likes_count': likes_count,
+            'has_disliked': has_disliked,
+            'has_liked': has_liked
+        })
