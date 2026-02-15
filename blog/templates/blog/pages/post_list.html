@@ -798,31 +798,53 @@
         }
 
         // Переключатель темы
-        function initThemeToggle() {
-            const toggle = document.getElementById('themeToggle');
-            if (!toggle) return;
-            
-            const html = document.documentElement;
-            const icon = toggle.querySelector('i');
-            
-            // Проверяем сохраненную тему
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            html.setAttribute('data-theme', savedTheme);
-            updateIcon(savedTheme);
-            
-            toggle.addEventListener('click', () => {
-                const currentTheme = html.getAttribute('data-theme');
-                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-                
-                html.setAttribute('data-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateIcon(newTheme);
-            });
-            
-            function updateIcon(theme) {
-                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-            }
+        function initThemeSync() {
+    const cosmicToggle = document.getElementById('themeToggle');
+    const baseToggle = document.getElementById('themeToggleBtn');
+    const html = document.documentElement;
+    const body = document.body;
+    
+    // Если нет космической кнопки - выходим
+    if (!cosmicToggle) return;
+    
+    // Функция обновления иконки космической кнопки
+    function updateCosmicIcon(theme) {
+        const icon = cosmicToggle.querySelector('i');
+        if (!icon) return;
+        
+        if (theme === 'dark') {
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
         }
+    }
+    
+    // Устанавливаем начальную тему из базовой
+    const initialTheme = body.getAttribute('data-bs-theme') || 'light';
+    html.setAttribute('data-theme', initialTheme);
+    updateCosmicIcon(initialTheme);
+    
+    // Слушаем клик по космической кнопке
+    cosmicToggle.addEventListener('click', async () => {
+        // Имитируем клик по базовой кнопке
+        if (baseToggle) {
+            baseToggle.click();
+        }
+    });
+    
+    // Наблюдаем за изменениями темы на body (от базовой кнопки)
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'data-bs-theme') {
+                const newTheme = body.getAttribute('data-bs-theme');
+                html.setAttribute('data-theme', newTheme);
+                updateCosmicIcon(newTheme);
+            }
+        });
+    });
+    
+    observer.observe(body, { attributes: true });
+}
 
         // Кнопка наверх
         function initScrollTop() {
@@ -1023,7 +1045,7 @@
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', () => {
             createStars();
-            initThemeToggle();
+            initThemeSync()
             initScrollTop();
             initFilters();
             
@@ -1232,9 +1254,9 @@
     </div>
 
     <!-- Кнопка наверх -->
-    <button id="scrollTop" class="scroll-top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    <button id="scrollToTopBtn" class="scroll-top">
+    <i class="fas fa-arrow-up"></i>
+</button>
 
     <!-- Переключатель темы -->
     <button id="themeToggle" class="theme-toggle">
