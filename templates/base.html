@@ -33,6 +33,9 @@
                         <li class="nav-item">
                             <a class="nav-link {% if request.resolver_match.url_name == 'new_post' %}active{% endif %}" href="{% url 'blog:new_post' %}">Создать пост</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'post_search' %}active{% endif %}" href="{% url 'blog:post_search' %}">Поиск постов</a>
+                        </li>
                     </ul>
                     <ul class="navbar-nav">
                         {% if request.user.is_authenticated %}
