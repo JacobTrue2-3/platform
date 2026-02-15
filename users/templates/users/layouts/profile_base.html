@@ -26,22 +26,24 @@
     <nav class="profile-nav">
       <ul>
         <li>
-          <a
-            href="{% url 'users:profile' user_username=user.username %}"
-            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
-          >
+          <a href="{% url 'users:profile' user_username=user.username %}"
+            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
             <i class="bi bi-person me-2"></i>Профиль
           </a>
         </li>
         {% if user == request.user %}
-          <li>
-            <a
-              href="{% url 'users:favorite_posts' %}"
-              class="{% if request.resolver_match.url_name == 'favorite_posts' %}active{% endif %}"
-            >
-              <i class="bi bi-bookmark me-2"></i>Избранное
-            </a>
-          </li>
+        <li>
+          <a href="{% url 'users:favorite_posts' %}"
+            class="{% if request.resolver_match.url_name == 'favorite_posts' %}active{% endif %}">
+            <i class="bi bi-bookmark me-2"></i>Избранное
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'users:password_change' %}"
+            class="{% if request.resolver_match.url_name == 'password_change' %}active{% endif %}">
+            <i class="bi bi-shield-lock me-2"></i>Сменить пароль
+          </a>
+        </li>
         {% endif %}
         <li>
           <a href="#" class="coming-soon">

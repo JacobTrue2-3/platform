@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
-from django.views.generic import CreateView, DetailView, ListView
-from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView
 from django.views.generic.list import MultipleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -36,6 +36,18 @@ class CustomLoginView(LoginView):
 
 class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('blog:post_list')
+
+
+class CustomPasswordChangeView(PasswordChangeView):
+    template_name = 'users/pages/password_change.html'
+    success_url = reverse_lazy('users:password_change_done')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Пароль успешно изменен!')
+        return super().form_valid(form)
+
+class PasswordChangeDoneView(TemplateView):
+    template_name = 'users/pages/password_change_done.html'
 
 
 class ProfileView(DetailView, MultipleObjectMixin):
