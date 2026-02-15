@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Подверждение удаления поста{% endblock title %}
+
+{% block content %}
+    <h1>Удаление поста</h1>
+    <p>Вы уверены, что хотите удалить пост "<strong>{{ post.title }}</strong>"?</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <button type="submit">Да, удалить</button>
+    </form>
+
+    <a href="{% url 'post_detail' post.id %}">Отмена</a>
+{% endblock content %}

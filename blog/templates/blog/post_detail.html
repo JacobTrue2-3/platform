@@ -11,10 +11,5 @@
     <p>{{ post.created_at }}</p>
 
     <a href="{% url 'edit_post' post.id %}">Редактировать пост</a>
-    
-    <form method="POST" action="{% url 'remove_post' post.id %}">
-        {% csrf_token %}
-
-        <button type="submit">Удалить пост</button>
-    </form>
+    <a href="{% url 'remove_post' post.id %}">Удалить пост</a>
 {% endblock content %}
