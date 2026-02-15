@@ -13,15 +13,22 @@ class PostListView(ListView):
     queryset = Post.objects.filter(status="published")
 
 
-def get_category_posts(request, category_slug):
-    category = get_object_or_404(Category, slug=category_slug)
-    posts = Post.objects.filter(category=category, status='published')
-    
-    context = {
-        'category': category,
-        'posts': posts
-    }
-    return render(request, 'blog/category_posts.html', context)
+class CategoryPostsView(ListView):
+    model = Post
+    template_name = 'blog/category_posts.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        self.category = get_object_or_404(Category, slug=self.kwargs['category_slug'])
+        return Post.objects.filter(category=self.category, status='published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['category'] = self.category
+        
+        return context
+
 
 def get_tag_posts(request, tag_slug):
     tag = get_object_or_404(Tag, slug=tag_slug)
