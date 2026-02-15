@@ -6,7 +6,7 @@
     <h1>{{ title }}</h1>
 
     {% comment %} action="{% url '' %}" можно не указывать {% endcomment %}
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
         
         <div>
@@ -19,6 +19,12 @@
             {{ form.text.label_tag }}
             {{ form.text }}
             {{ form.text.errors }}
+        </div>
+
+        <div>
+            {{ form.image.label_tag }}
+            {{ form.image }}
+            {{ form.image.errors }}
         </div>
 
         <button type="submit">{{ submit_button_text }}</button>

@@ -31,7 +31,7 @@ def create_post(request):
         return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
     
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
 
         if form.is_valid():
             post = form.save(commit=False)
