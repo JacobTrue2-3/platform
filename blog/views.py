@@ -34,8 +34,11 @@ def create_post(request):
         form = PostForm(request.POST)
 
         if form.is_valid():
-            post = form.save()
-            print(post)
+            post = form.save(commit=False)
+
+            post.author = request.user
+
+            post.save()
 
             return redirect('blog:post_detail', post_id=post.id)
         else:
