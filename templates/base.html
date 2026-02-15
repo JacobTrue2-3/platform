@@ -40,7 +40,10 @@
                                 <a class="nav-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.user_username == request.user.username %}active{% endif %}" href="{% url "users:profile" request.user.username %}"><i class="bi bi-person-circle me-1"></i>{{ request.user }}</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{% url 'users:logout' %}">Выйти из аккаута</a>
+                                <form class='nav-link' method="POST" action="{% url 'users:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit">Выйти из аккаута</button>
+                                </form>
                             </li>
                         {% else %}
                             <li class="nav-item">
