@@ -31,7 +31,10 @@ def login_view(request):
             login(request, user)
 
             next_url = request.GET.get('next', LOGIN_REDIRECT_URL) # '/posts/add/'
-            return redirect(next_url)
+            if next_url == LOGIN_REDIRECT_URL:
+                return redirect(next_url, request.user.username)
+            else:
+                return redirect(next_url)
         else:
             return render(request, 'users/login.html', {'form': form})
 
