@@ -7,8 +7,9 @@ source venv/Scripts/activate
 pip install -r requirements.txt
 ```
  
-## Применение миграций
+## Создание и применение миграций
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
