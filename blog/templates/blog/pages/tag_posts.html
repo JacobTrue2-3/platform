@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
 {% endblock styles %}
 
+{% block scripts %}
+    <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
 {% block content %}
     <a href="javascript:history.back()">&larr;Назад</a>
     <h1>Посты с тегом: #{{ tag.name }}</h1>

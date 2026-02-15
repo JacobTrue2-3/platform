@@ -1,10 +1,11 @@
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, ListView
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.list import MultipleObjectMixin
 from django.urls import reverse_lazy
 from django.contrib import messages
+from django.shortcuts import get_object_or_404
 
 from config.settings import LOGIN_REDIRECT_URL
 from blog.models import Post
@@ -60,3 +61,14 @@ class ProfileView(DetailView, MultipleObjectMixin):
         del context['object_list']
 
         return context
+
+
+class FavoritePostsView(ListView):
+    model = Post
+    template_name = 'users/pages/favorite_posts.html'
+    context_object_name = "posts"
+    paginate_by = 2
+
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs['user_username'])
+        return user.favorite_posts.all()

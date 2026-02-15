@@ -41,6 +41,12 @@ class Post(models.Model):
         blank=True,
         verbose_name="Дизлайки"
     )
+    favorites = models.ManyToManyField(
+        User,
+        related_name="favorite_posts",
+        blank=True,
+        verbose_name="В избранном у"
+    )
 
     class Meta:
         verbose_name = 'Пост'

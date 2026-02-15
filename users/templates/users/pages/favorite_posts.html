@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block title %}Избранные посты{% endblock title %}
+
+{% block styles %}
+  <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+{% endblock styles %}
+
+{% block scripts %}
+    <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+{% endblock scripts %}
+
+{% block content %}
+  <h1 class="text-center">Избранные посты</h1>
+
+  <div class="container" data-page-type="favorite-posts">
+    {% for post in posts %}
+      {% include 'blog/includes/post_container.html' %}
+    {% empty %}
+      <p class="text-center">Пока нет избранных постов.</p>
+    {% endfor %}
+
+    {% include "blog/includes/pagination.html" %}
+  </div>
+{% endblock content %}

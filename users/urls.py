@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', views.CustomLogoutView.as_view(), name='logout'),
 
     path("<str:user_username>/", views.ProfileView.as_view(), name='profile'),
+    path("<str:user_username>/favorite-posts/", views.FavoritePostsView.as_view(), name="favorite_posts"),
 ]

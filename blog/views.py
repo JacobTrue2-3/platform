@@ -284,3 +284,20 @@ class PostDislikeToggleView(View):
             'has_disliked': has_disliked,
             'has_liked': has_liked
         })
+
+
+class PostFavoriteToggleView(View):
+    def post(self, request, post_id, *args, **kwargs):
+        post = get_object_or_404(Post, id=post_id)
+
+        if request.user in post.favorites.all():
+            post.favorites.remove(request.user)
+            is_favorite = False
+        else:
+            post.favorites.add(request.user)
+            is_favorite = True
+
+        return JsonResponse({
+            'is_favorite': is_favorite,
+            'favorites_count': post.favorites.count()
+        })
