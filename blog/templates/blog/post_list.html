@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список постов</title>
+</head>
+<body>
+    <h1>Список постов сайта</h1>
+
+    {# Отображение постов #}
+    {% if posts %}
+        {% for post in posts %}
+            <div class="post-container" style="border: 1px solid black; margin-bottom: 10px; padding: 15px;">
+                <h2>Заголовок поста: {{ post.title }}</h2>
+                <p>Текст поста: {{ post.text }}</p>
+                <small>Дата создания поста: {{ post.created_at|date:"d.m.Y H:i" }}</small>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Постов ещё нет. Загляните позже!</p>
+    {% endif %}
+</body>
+</html>
