@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Создать пост{% endblock title %}
+
+{% block content %}
+    <h1>Создать новый пост</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div>
+            <label for="titleInput">Заголовок поста:</label>
+            <input id="titleInput" name="title" type="text" placeholder="заголовок (максимальная длина 200 символов)" required>
+        </div>
+
+        <div>
+            <label for="textInput">Текст поста:</label>
+            <textarea id="textInput" name="text" rows="3"></textarea>
+        </div>
+
+        <button type="submit">Создать</button>
+    </form>
+{% endblock content %}
