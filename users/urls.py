@@ -51,5 +51,6 @@ urlpatterns = [
     path("toggle-theme/", views.toggle_theme, name="toggle_theme"),
 
     path("favorite-posts/", views.FavoritePostsView.as_view(), name="favorite_posts"),
+    path('settings/', views.SettingsView.as_view(), name='settings'),
     path("<str:user_username>/", views.ProfileView.as_view(), name='profile'),
 ]
