@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.views.generic import CreateView, DetailView
 from django.contrib.auth.views import LoginView, LogoutView
+from django.views.generic.list import MultipleObjectMixin
 from django.urls import reverse_lazy
 
 from config.settings import LOGIN_REDIRECT_URL
@@ -31,16 +32,24 @@ class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('blog:post_list')
 
 
-class ProfileView(DetailView):
+class ProfileView(DetailView, MultipleObjectMixin):
     model = User
     template_name = 'users/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'user_username'
     # context_object_name = 'user' Необязательно
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        posts = Post.objects.filter(
+            author=self.object
+        ).order_by('-created_at')
 
-        context['posts'] = Post.objects.filter(author=self.object).order_by('-created_at')
+        # Контекст теперь включает paginator, page_obj, is_paginated
+        context = super().get_context_data(object_list=posts, **kwargs)
+        
+        context['posts'] = context['object_list']
+        
+        del context['object_list']
 
         return context
