@@ -13,7 +13,7 @@
 
 {% block content %}
     <a href="javascript:history.back()">&larr;Назад</a>
-    <h1>Посты в категории: {{ category.name }}</h1>
+    <h1 class="text-center">Посты в категории: {{ category.name }}</h1>
     
     {% if posts %}
         {% for post in posts %}
