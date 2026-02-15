@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 
-from .models import Post
+from .models import Post, Category
 from .forms import PostForm
 
 
@@ -9,6 +9,17 @@ def get_post_list(request):
     posts = Post.objects.filter(status="published")
 
     return render(request, 'blog/post_list.html', context={'posts': posts})
+
+
+def get_category_posts(request, category_slug):
+    category = get_object_or_404(Category, slug=category_slug)
+    posts = Post.objects.filter(category=category, status='published')
+    
+    context = {
+        'category': category,
+        'posts': posts
+    }
+    return render(request, 'blog/category_posts.html', context)
 
 
 def get_post_detail(request, post_slug):

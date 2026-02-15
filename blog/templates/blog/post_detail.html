@@ -12,6 +12,9 @@
         Статус: {{ post.get_status_display }}
     {% endif %}
 
+    <p>Категория: <a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a></p>
+    {% comment %} <p>Категория: <a href="{% url 'blog:category_posts' post.category.slug %}">{{ post.category.name }}</a></p> {% endcomment %}
+
     {% if post.image %}
         <img src="{{ post.image.url }}" alt="Картинка поста">
     {% endif %}

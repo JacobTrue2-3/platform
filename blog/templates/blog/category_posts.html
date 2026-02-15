@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Посты в категории {{ category.name }}{% endblock title %}
+
+{% block content %}
+    <a href="javascript:history.back()">&larr;Назад ко всем постам</a>
+    <h1>Посты в категории: {{ category.name }}</h1>
+    
+    {% if posts %}
+        {% for post in posts %}
+            {% include 'blog/includes/post_container_include.html' %}
+        {% endfor %}
+    {% else %}
+        <p>В этой категории пока нет постов.</p>
+    {% endif %}
+{% endblock content %}
