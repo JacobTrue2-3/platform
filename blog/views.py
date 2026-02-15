@@ -72,3 +72,7 @@ def delete_post(request, post_id):
         return redirect("blog:post_list")
     
     return render(request, 'blog/confirm_post_delete.html', {'post': post})
+
+
+def main_page_view(request):
+    return render(request, template_name='blog/main_page.html')
