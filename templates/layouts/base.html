@@ -20,8 +20,8 @@
     {% block scripts %}{% endblock scripts %}
 </head>
 <body class="d-flex flex-column min-vh-100" data-bs-theme="{{ current_theme }}" data-theme-toggle-url="{% url "users:toggle_theme" %}">
-    <header>
-        <nav class="navbar navbar-expand-sm rounded-bottom border-bottom border-primary">
+    <header class="rounded-bottom border-bottom border-2 header">
+        <nav class="navbar navbar-expand-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'blog:main_page' %}">Pikabu</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -76,7 +76,7 @@
         </nav>
     </header>
     <main class="flex-grow-1">{% block content %}{% endblock content %}</main>
-    <footer class="rounded-top border-top border-primary py-3">
+    <footer class="rounded-top border-top border-2 py-3 footer">
         <div class="container-fluid">
             <div class="text-center">
                 &copy; Все права защищены 2025

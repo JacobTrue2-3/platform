@@ -1,3 +1,8 @@
 body[data-bs-theme="light"] {
+  --header-bg-color: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  --footer-bg-color: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+  --header-border-color: #f59e0b;
+  --footer-border-color: #f59e0b;
+
   --avatar-accent-color: #ff6b6b;
 }

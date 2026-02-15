@@ -1,0 +1,9 @@
+.header {
+  background: var(--header-bg-color);
+  border-bottom-color: var(--header-border-color) !important;
+}
+
+.footer {
+  background: var(--footer-bg-color);
+  border-top-color: var(--footer-border-color) !important;
+}
