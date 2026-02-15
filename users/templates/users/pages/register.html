@@ -1,12 +1,38 @@
 {% extends "layouts/base.html" %}
 {% load django_bootstrap5 %}
 
-{% block content %}
-    <h1>Регистрация</h1>
-    <form method="POST">
-        {% csrf_token %}
+{% block title %}Регистрация{% endblock title %}
 
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">Создать аккаунт</button>
-    </form>
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">Регистрация</h1>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        {% bootstrap_form form %}
+                        
+                        <div class="d-grid gap-2 mb-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-person-plus me-2"></i>Создать аккаунт
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted">Уже есть аккаунт?
+                            <a href="{% url 'users:login' %}" class="text-decoration-none ms-1">
+                                Войти
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
