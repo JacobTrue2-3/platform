@@ -137,3 +137,5 @@ LOGIN_REDIRECT_URL = 'users:profile'
 AUTHENTICATION_BACKENDS = [
     'users.auth_backend.EmailOrUsernameBackend'
 ]
+
+AUTH_USER_MODEL = "users.CustomUser"

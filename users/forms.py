@@ -1,4 +1,7 @@
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -15,3 +18,9 @@ class CustomAuthenticationForm(AuthenticationForm):
         "Обратите внимание, что оба поля могут быть чувствительны к регистру."
       )
     })
+
+
+class CustomUserCreationForm(UserCreationForm):
+  class Meta:
+    model = User
+    fields = ("username", "email", "password1", "password2")
