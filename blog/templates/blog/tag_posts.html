@@ -8,7 +8,9 @@
     
     {% if posts %}
         {% for post in posts %}
-            {% include 'blog/includes/post_container_include.html' %}
+            <div class="container">
+                {% include 'blog/includes/post_container_include.html' %}
+            </div>
         {% endfor %}
     {% else %}
         <p>С этим тегом пока нет постов.</p>

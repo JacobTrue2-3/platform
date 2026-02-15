@@ -7,9 +7,11 @@
 
     {# Отображение постов #}
     {% if posts %}
-        {% for post in posts %}
-            {% include 'blog/includes/post_container_include.html' %}
-        {% endfor %}
+        <div class="container">
+            {% for post in posts %}
+                {% include 'blog/includes/post_container_include.html' %}
+            {% endfor %}
+        </div>
     {% else %}
         <p>Постов ещё нет. Загляните позже!</p>
     {% endif %}
