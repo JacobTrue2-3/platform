@@ -3,6 +3,5 @@
 }
 
 .post-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 15px rgba(var(--bs-body-color-rgb), 0.1) !important;
 }
