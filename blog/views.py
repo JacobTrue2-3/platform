@@ -69,6 +69,11 @@ class PostDetailView(DetailView):
 
             self.request.session[session_key] = True
 
+        user = self.request.user
+        if user.is_authenticated and user != post.author:
+            if not post.viewed_users.filter(id=user.id).exists():
+                post.viewed_users.add(user)
+
         return post
 
 
