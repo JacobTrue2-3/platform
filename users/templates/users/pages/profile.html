@@ -13,7 +13,7 @@
         {% for post in posts %}
             <div class="container">
                 {% if user == request.user or post.status != 'draft' %}
-                    {% include 'blog/includes/post_container_include.html' %}
+                    {% include 'blog/includes/post_container.html' %}
                 {% endif %}
             </div>
         {% endfor %}
@@ -21,5 +21,5 @@
         <p>Постов ещё нет. Загляните позже!</p>
     {% endif %}
 
-    {% include "blog/includes/pagination_include.html" %}
+    {% include "blog/includes/pagination.html" %}
 {% endblock content %}

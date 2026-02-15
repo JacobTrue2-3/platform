@@ -9,12 +9,12 @@
     {% if posts %}
         <div class="container">
             {% for post in posts %}
-                {% include 'blog/includes/post_container_include.html' %}
+                {% include 'blog/includes/post_container.html' %}
             {% endfor %}
         </div>
     {% else %}
         <p>Постов ещё нет. Загляните позже!</p>
     {% endif %}
 
-    {% include "blog/includes/pagination_include.html" %}
+    {% include "blog/includes/pagination.html" %}
 {% endblock content %}
