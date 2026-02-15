@@ -40,7 +40,7 @@
         <!-- Текст поста -->
         <div class="card-text mb-3">
             <p class="text-muted mb-1">Текст поста:</p>
-            <p class="mb-0">{{ post.text|truncatewords:30 }}</p>
+            <p class="mb-0">{{ post.text|truncatechars:500 }}</p>
         </div>
 
         <!-- Дата создания -->
