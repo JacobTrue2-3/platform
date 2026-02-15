@@ -62,6 +62,11 @@ class Post(models.Model):
 
         super().save(*args, **kwargs)
 
+        # Проверяем, опубликован ли пост, есть ли у этого поста связанная новость и закреплена ли она
+        if self.status == "published" and hasattr(self, 'news_item') and self.news_item.pinned:
+            # Снимаем закрепление с других новостей
+            News.objects.filter(pinned=True).exclude(post_item=self).update(pinned=False)
+
 
 class News(models.Model):
     post_item = models.OneToOneField(
