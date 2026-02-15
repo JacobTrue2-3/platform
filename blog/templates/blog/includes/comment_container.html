@@ -1,4 +1,4 @@
-<div class="card mb-3">
+<div class="card mb-3 comment-container">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start">
             <h6 class="card-title mb-1">
@@ -8,6 +8,56 @@
             </h6>
             <small class="text-muted date-field">{{ comment.created_at|date:"c" }}</small>
         </div>
+
+        <!-- Блок цитаты для ответов -->
+        {% if comment.parent %}
+        <div class="mb-2 p-2 bg-light border rounded">
+            <small class="text-muted">
+                <i class="bi bi-arrow-return-right"></i>
+                Ответ на комментарий 
+                <a href="{% url 'users:profile' comment.parent.author.username %}" class="text-decoration-none">
+                    {{ comment.parent.author.username }}
+                </a>:
+            </small>
+            <blockquote class="mb-0 mt-1 small text-dark">
+                "{{ comment.parent.text }}"
+            </blockquote>
+        </div>
+        {% endif %}
+
         <p class="card-text mt-2">{{ comment.text }}</p>
+        
+        <!-- Кнопка ответа -->
+        {% if request.user.is_authenticated %}
+        <div class="mt-2">
+            <button
+                class="btn btn-sm btn-outline-dark reply-btn" 
+                data-comment-id="{{ comment.id }}"
+            >
+                <i class="bi bi-reply"></i> Ответить
+            </button>
+        </div>
+        {% endif %}
+        
+        <!-- Форма ответа (скрыта по умолчанию) -->
+        <div class="mt-3 d-none reply-form-container" id="replyForm{{ comment.id }}">
+            <form class="reply-form" data-add-comment-url="{% url 'blog:add_comment' comment.post.id %}" data-parent-id="{{ comment.id }}">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <textarea class="form-control form-control-sm" rows="2" placeholder="Ответить {{ comment.author.username }}..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-dark btn-sm">Отправить</button>
+                    <button type="button" class="btn btn-danger btn-sm cancel-reply-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Блок ответов -->
+        <div class="mt-3 ms-3 border-start ps-3 replies">
+            {% for reply in comment.replies.all %}
+                {% include 'blog/includes/comment_container.html' with comment=reply %}
+            {% endfor %}
+        </div>
     </div>
 </div>
