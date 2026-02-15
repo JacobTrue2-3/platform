@@ -114,7 +114,6 @@ class Comment(models.Model):
         return f'Комментарий от {self.author} к "{self.post}": {self.text if len(self.text) < 20 else self.text[:20] + '...'}'
 
     class Meta:
-        ordering = ['-created_at']
         verbose_name = 'Комментарий'
         verbose_name_plural = "Комментарии"
         db_table = "blog_comments"
