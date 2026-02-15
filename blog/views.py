@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Post, Category, Tag
@@ -77,32 +77,31 @@ class CreatePostView(LoginRequiredMixin, CreateView):
         return redirect('blog:post_detail', post_slug=post.slug)
 
 
-def update_post(request, post_id):
-    title = "Редактировать пост"
-    submit_button_text = 'Обновить'
+class PostUpdateView(LoginRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    pk_url_kwarg = 'post_id'  # потому что в url <int:post_id>, а не <int:id>
 
-    post = get_object_or_404(Post, id=post_id)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES, instance=post)
+        context['title'] = "Редактировать пост"
+        context['submit_button_text'] = "Обновить"
+        context['form'].fields['tags_input'].initial = ", ".join(tag.name for tag in self.object.tags.all())
+        
+        return context
 
-        if form.is_valid():
-            updated_post = form.save()
+    def form_valid(self, form):
+        updated_post = form.save()
 
-            tags = form.cleaned_data.get('tags_input', [])
-            updated_post.tags.clear()
-            for tag_name in tags:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                updated_post.tags.add(tag)
+        tags = form.cleaned_data.get('tags_input', [])
+        updated_post.tags.clear()
+        for tag_name in tags:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            updated_post.tags.add(tag)
 
-            return redirect("blog:post_detail", post_slug=updated_post.slug)
-        else:
-            return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
-
-    existing_tags = ", ".join(tag.name for tag in post.tags.all())
-    form = PostForm(instance=post, initial={'tags_input': existing_tags})
-
-    return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
+        return redirect('blog:post_detail', post_slug=self.object.slug)
 
 
 def delete_post(request, post_id):
