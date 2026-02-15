@@ -9,124 +9,182 @@
 {% endblock scripts %}
 
 {% block content %}
-    <a href="javascript:history.back()">&larr;Назад</a>
-    <h1>Детали поста</h1>
-    <h2>Идентификатор поста: {{ post.id }}</h2>
-    <h3>{{ post.title }}</h3>
-
-    {% if request.user == post.author %}
-        Статус: {{ post.get_status_display }}
-    {% endif %}
-
-    <p>Категория: <a href="{{ post.category.get_absolute_url }}">{{ post.category.name }}</a></p>
-    {% comment %} <p>Категория: <a href="{% url 'blog:category_posts' post.category.slug %}">{{ post.category.name }}</a></p> {% endcomment %}
-
-    <p>Теги: 
-        {% for tag in post.tags.all %}
-            <a href="{{ tag.get_absolute_url }}">#{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}
-        {% empty %}
-            нет тегов
-        {% endfor %}
-    </p>
-
-    {% if post.image %}
-        <img src="{{ post.image.url }}" alt="Картинка поста">
-    {% endif %}
-
-    <p>{{ post.text }}</p>
-    <p>Дата создания поста: <span class="date-field">{{ post.created_at|date:"c" }}<span></p>
-    <p>Дата последнего изменения поста: <span class="date-field">{{ post.updated_at|date:"c" }}<span></p>
-
-    <div id="postReactions" 
-        data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
-        data-login-url="{% url 'users:login' %}">
-        <button
-            id='likeBtn'
-            class="btn btn-sm {% if is_liked %}btn-primary{% else %}btn-outline-primary{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
-            data-url="{% url "blog:post_like" post.id %}"
-        >
-            <i class="bi bi-hand-thumbs-up{% if is_liked %}-fill{% endif %}"></i>
-            <span id="likesCount">{{ likes_count }}</span>
-        </button>
-
-        <button
-            id='dislikeBtn'
-            class="btn btn-sm {% if is_disliked %}btn-danger{% else %}btn-outline-danger{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
-            data-url="{% url "blog:post_dislike" post.id %}"
-        >
-            <i class="bi bi-hand-thumbs-down{% if is_disliked %}-fill{% endif %}"></i>
-            <span id="dislikesCount">{{ dislikes_count }}</span>
-        </button>
+<div class="container py-4">
+    <!-- Навигация -->
+    <div class="mb-4">
+        <a href="javascript:history.back()" class="text-decoration-none text-secondary">
+            <i class="bi bi-arrow-left"></i> Назад
+        </a>
     </div>
 
-    <p>
-        Автор поста: <a href="{% url "users:profile" user_username=post.author.username %}">{{ post.author }}</a>
-        <i class="bi bi-eye"></i> {{ post.views }}
-    </p>
+    <!-- Основной контент поста -->
+    <article class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <!-- Заголовок и статус -->
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <h1 class="h2 mb-0">{{ post.title }}</h1>
+                {% if request.user == post.author %}
+                    <span class="badge bg-info rounded-pill">{{ post.get_status_display }}</span>
+                {% endif %}
+            </div>
 
-    {% if request.user == post.author %}
-        <a href="{% url 'blog:edit_post' post.id %}">Редактировать пост</a>
-        <a href="{% url 'blog:remove_post' post.id %}">Удалить пост</a>
-    {% endif %}
+            <!-- Мета-информация -->
+            <div class="d-flex flex-wrap gap-3 mb-4 text-secondary">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-circle me-2"></i>
+                    <a href="{% url "users:profile" user_username=post.author.username %}" class="text-decoration-none">
+                        {{ post.author }}
+                    </a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-folder me-2"></i>
+                    <a href="{{ post.category.get_absolute_url }}" class="text-decoration-none">
+                        {{ post.category.name }}
+                    </a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-eye me-2"></i>
+                    <span>{{ post.views }} просмотров</span>
+                </div>
+            </div>
+
+            <!-- Теги -->
+            {% if post.tags.all %}
+                <div class="mb-4">
+                    {% for tag in post.tags.all %}
+                        <a href="{{ tag.get_absolute_url }}" class="badge bg-light text-dark text-decoration-none me-2 py-2 px-3">
+                            #{{ tag.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Изображение -->
+            {% if post.image %}
+                <div class="mb-4 text-center">
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}" class="img-fluid rounded" style="max-height: 500px;">
+                </div>
+            {% endif %}
+
+            <!-- Текст поста -->
+            <div class="mb-4 fs-5 lh-lg">
+                {{ post.text|linebreaks }}
+            </div>
+
+            <!-- Даты -->
+            <div class="row g-3 mb-4 text-secondary small">
+                <div class="col-auto">
+                    <i class="bi bi-calendar-plus me-1"></i>
+                    <span class="date-field">{{ post.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                {% if post.updated_at != post.created_at %}
+                    <div class="col-auto">
+                        <i class="bi bi-calendar-check me-1"></i>
+                        <span class="date-field">{{ post.updated_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Реакции -->
+            <div id="postReactions" class="mb-4"
+                data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+                data-login-url="{% url 'users:login' %}">
+                <div class="d-flex gap-2">
+                    <button id="likeBtn"
+                        class="btn {% if is_liked %}btn-primary{% else %}btn-outline-primary{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
+                        data-url="{% url "blog:post_like" post.id %}">
+                        <i class="bi bi-hand-thumbs-up{% if is_liked %}-fill{% endif %} me-1"></i>
+                        <span id="likesCount">{{ likes_count }}</span>
+                    </button>
+                    <button id="dislikeBtn"
+                        class="btn {% if is_disliked %}btn-danger{% else %}btn-outline-danger{% endif %} {% if request.user == post.author %}disabled{% endif %} js-reaction-btn"
+                        data-url="{% url "blog:post_dislike" post.id %}">
+                        <i class="bi bi-hand-thumbs-down{% if is_disliked %}-fill{% endif %} me-1"></i>
+                        <span id="dislikesCount">{{ dislikes_count }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Действия для автора -->
+            {% if request.user == post.author %}
+                <div class="border-top pt-3 d-flex gap-2">
+                    <a href="{% url 'blog:edit_post' post.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-pencil me-1"></i>Редактировать
+                    </a>
+                    <a href="{% url 'blog:remove_post' post.id %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash me-1"></i>Удалить
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </article>
 
     <!-- Блок комментариев -->
-    <div class="mt-4">
-        <h4 id="commentsTitle">Комментарии ({{ post.comments.count }})</h4>
-        
+    <section class="mt-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h3 id="commentsTitle" class="h4 mb-0">
+                Комментарии <span class="badge bg-secondary rounded-pill">{{ post.comments.count }}</span>
+            </h3>
+        </div>
+
         <!-- Форма добавления комментария -->
         {% if request.user.is_authenticated %}
-            <form
-                id="commentForm"
-                data-add-comment-url="{% url "blog:add_comment" post.id %}"
-            >
-                {% csrf_token %}
-                
-                <!-- Блок для ошибок -->
-                <div id="commentErrors" class="alert alert-danger d-none"></div>
-                
-                <div class="mb-3">
-                    <textarea name="text" class="form-control" rows="3" placeholder="Оставьте ваш комментарий..."></textarea>
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <form id="commentForm" data-add-comment-url="{% url "blog:add_comment" post.id %}">
+                        {% csrf_token %}
+                        <div id="commentErrors" class="alert alert-danger d-none"></div>
+                        <div class="mb-3">
+                            <textarea name="text" class="form-control" rows="3" placeholder="Напишите комментарий..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send me-1"></i>Отправить
+                        </button>
+                    </form>
                 </div>
-                <button type="submit" class="btn btn-primary">Добавить комментарий</button>
-            </form>
+            </div>
         {% else %}
-            <p class="text-muted">Чтобы оставить комментарий, <a href="{% url 'users:login' %}">войдите</a> в аккаунт.</p>
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle me-2"></i>
+                Чтобы оставить комментарий, <a href="{% url 'users:login' %}" class="alert-link">войдите</a> в аккаунт.
+            </div>
         {% endif %}
 
         <!-- Список комментариев -->
-        <div 
-            id="commentsList"
+        <div id="commentsList"
             class="mt-3"
             data-initial-offset="{{ comments|length }}"
             data-has-more="{{ has_more_comments }}"
             data-batch-size="{{ comments_per_batch }}"
             data-load-more-url="{% url 'blog:load_more_comments' post.id %}"
             data-trigger-type="button"
-            data-load-more-btn-id="loadMoreCommentsBtn"
-        >
+            data-load-more-btn-id="loadMoreCommentsBtn">
+
             {% for comment in comments %}
                 {% include 'blog/includes/comment_container.html' %}
             {% empty %}
-                <p id="emptyMessage" class="text-muted">Пока нет комментариев. Будьте первым!</p>
+                <div id="emptyMessage" class="text-center py-5">
+                    <i class="bi bi-chat-dots fs-1 text-secondary"></i>
+                    <p class="text-secondary mt-2">Пока нет комментариев. Будьте первым!</p>
+                </div>
             {% endfor %}
         </div>
 
-        {% if has_more_comments %}
-            <div id="loadingSpinner" class="text-center d-none">
-                <div class="spinner-border spinner-border-sm" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
-                </div>
+        <!-- Загрузка -->
+        <div id="loadingSpinner" class="text-center my-3 d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
             </div>
-        {% endif %}
+        </div>
 
-        <!-- Кнопка "Загрузить еще" для комментариев -->
+        <!-- Кнопка "Загрузить еще" -->
         {% if has_more_comments %}
-            <div class="text-center my-3">
-                <button id="loadMoreCommentsBtn" class="btn btn-outline-primary">
-                    Загрузить еще комментарии
+            <div class="text-center my-4">
+                <button id="loadMoreCommentsBtn" class="btn btn-outline-primary px-4">
+                    <i class="bi bi-arrow-down me-1"></i>Загрузить еще
                 </button>
             </div>
         {% endif %}
-    </div>
-    <!-- Конец блока комментариев -->
+    </section>
+</div>
 {% endblock content %}

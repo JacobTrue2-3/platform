@@ -1,44 +1,1253 @@
 {% extends "layouts/base.html" %}
 {% load static %}
 
-{% block title %}Список постов{% endblock title %}
+{% block title %}Все посты — твой блог{% endblock title %}
 
 {% block styles %}
-    <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+    <link rel="stylesheet" href="{% static 'blog/css/includes/post_container.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+        :root {
+            /* Основная палитра — космическая эстетика */
+            --deep-space: #0b0d17;
+            --cosmic-purple: #8b5cf6;
+            --nebula-pink: #ec4899;
+            --stellar-blue: #3b82f6;
+            --aurora-green: #10b981;
+            --starlight: #f9fafb;
+            --stardust: #d1d5db;
+            
+            /* Градиенты */
+            --gradient-cosmic: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a78bfa 100%);
+            --gradient-nebula: linear-gradient(135deg, #ec4899, #8b5cf6, #3b82f6);
+            --gradient-aurora: linear-gradient(135deg, #10b981, #3b82f6, #8b5cf6);
+            
+            /* Эффекты */
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            
+            /* Анимации */
+            --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-border: rgba(203, 213, 225, 0.5);
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 30px 60px -15px rgba(99, 102, 241, 0.3);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0b0d17;
+            --bg-secondary: #111827;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --card-bg: rgba(17, 24, 39, 0.8);
+            --card-border: rgba(55, 65, 81, 0.5);
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 30px 60px -15px rgba(139, 92, 246, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition-smooth);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cosmic-purple);
+            border-radius: 20px;
+            border: 2px solid var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--nebula-pink);
+        }
+
+        /* Hero Section — космический уровень */
+        .hero-section {
+            position: relative;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--deep-space);
+            margin-bottom: 4rem;
+        }
+
+        .hero-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: var(--opacity);
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, white, transparent);
+            animation: shoot var(--duration) linear infinite;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: var(--opacity); transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(-200%) translateY(-200%) rotate(45deg);
+                opacity: 1;
+            }
+            70% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(500%) translateY(500%) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        .nebula {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, 
+                rgba(139, 92, 246, 0.4) 0%, 
+                rgba(236, 72, 153, 0.3) 30%, 
+                rgba(59, 130, 246, 0.2) 60%, 
+                transparent 80%
+            );
+            filter: blur(100px);
+            animation: nebulaDrift 30s ease-in-out infinite alternate;
+        }
+
+        .nebula-1 {
+            top: -200px;
+            right: -200px;
+        }
+
+        .nebula-2 {
+            bottom: -300px;
+            left: -200px;
+            width: 1000px;
+            height: 1000px;
+            background: radial-gradient(circle, 
+                rgba(16, 185, 129, 0.3) 0%, 
+                rgba(139, 92, 246, 0.2) 40%, 
+                transparent 70%
+            );
+            animation: nebulaDrift 25s ease-in-out infinite reverse;
+        }
+
+        @keyframes nebulaDrift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.2); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            color: white;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 8rem);
+            font-weight: 900;
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            margin: 0;
+            background: linear-gradient(135deg, 
+                #ffffff 0%, 
+                #ec4899 25%, 
+                #8b5cf6 50%, 
+                #3b82f6 75%, 
+                #10b981 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 8s ease infinite, fadeInUp 1s ease 0.2s both;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, 
+                rgba(255,255,255,0.3) 0%, 
+                transparent 50%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: blur(20px);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            color: rgba(255, 255, 255, 0.8);
+            margin: 2rem auto 3rem;
+            max-width: 800px;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease 0.6s both;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 2.5rem;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            transition: var(--transition-bounce);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Секция фильтров */
+        .filters-section {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            padding: 1rem 2rem;
+        }
+
+        .filters-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 60px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-btn {
+            padding: 0.8rem 2rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--gradient-cosmic);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        .filter-btn:hover::before,
+        .filter-btn.active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            color: white;
+        }
+
+        .filter-btn i {
+            margin-right: 0.5rem;
+        }
+
+        /* Сетка постов — галактический уровень */
+        .posts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2.5rem;
+            padding: 2rem 0 6rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1200px) {
+            .posts-container {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 2rem;
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .posts-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1.5rem 1rem;
+            }
+            
+            .hero-stats {
+                gap: 1rem;
+            }
+            
+            .stat-item {
+                padding: 1rem 1.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        /* Анимация карточек */
+        .card-enter {
+            opacity: 0;
+            transform: translateY(50px) scale(0.95);
+            animation: cardFloatIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            animation-delay: calc(var(--order) * 80ms);
+        }
+
+        @keyframes cardFloatIn {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Космическое пустое состояние */
+        .empty-state {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-state::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(139,92,246,0.2) 0%, transparent 70%);
+            filter: blur(60px);
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.2); }
+        }
+
+        .empty-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .empty-galaxy {
+            font-size: 8rem;
+            margin-bottom: 2rem;
+            display: inline-block;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(139,92,246,0.5));
+        }
+
+        .empty-galaxy i {
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .empty-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            background: var(--gradient-cosmic);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-text {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .empty-btn {
+            display: inline-block;
+            padding: 1.2rem 3rem;
+            background: var(--gradient-cosmic);
+            color: white;
+            text-decoration: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition-bounce);
+            box-shadow: 0 10px 30px rgba(139,92,246,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .empty-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .empty-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .empty-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(139,92,246,0.5);
+        }
+
+        /* Загрузчик */
+        #loadingSpinner {
+            text-align: center;
+            padding: 5rem 0;
+        }
+
+        .cosmic-spinner {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--cosmic-purple);
+            border-right-color: var(--nebula-pink);
+            border-bottom-color: var(--stellar-blue);
+            border-left-color: var(--aurora-green);
+            animation: spin 1.5s linear infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            top: 10px;
+            left: 10px;
+            animation: spin 2s linear infinite reverse;
+        }
+
+        .spinner-ring:nth-child(3) {
+            width: 40px;
+            height: 40px;
+            top: 20px;
+            left: 20px;
+            animation: spin 2.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-top: 2rem;
+        }
+
+        /* Кнопка наверх */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-cosmic);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(139,92,246,0.3);
+            transition: var(--transition-bounce);
+            z-index: 1000;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-10px) scale(1.1);
+            box-shadow: 0 20px 40px rgba(139,92,246,0.5);
+        }
+
+        .scroll-top.visible {
+            display: flex;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        /* Переключатель темы */
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: var(--transition-bounce);
+            z-index: 1000;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg) scale(1.1);
+        }
+
+        /* Статистика на странице */
+        .page-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: -2rem auto 3rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-card-mini {
+            padding: 1rem 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: var(--transition-bounce);
+        }
+
+        .stat-card-mini:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon-mini {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-cosmic);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-info-mini h4 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .stat-info-mini p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+/* Добавим стили для активных фильтров */
+        .filter-btn.active {
+            background: var(--gradient-cosmic);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* Анимация для обновления статистики */
+        .stat-number {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-number.updated {
+            transform: scale(1.2);
+            color: var(--nebula-pink);
+        }
+        
+        /* Индикатор загрузки фильтров */
+        .filter-loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cosmic-purple), var(--nebula-pink), var(--stellar-blue));
+            animation: loadingBar 1.5s ease infinite;
+            z-index: 9999;
+            display: none;
+        }
+        
+        @keyframes loadingBar {
+            0% { width: 0%; opacity: 1; }
+            50% { width: 70%; opacity: 0.8; }
+            100% { width: 100%; opacity: 0; }
+        }
+        
+        .filter-loading.active {
+            display: block;
+        }
+    </style>
 {% endblock styles %}
 
 {% block scripts %}
-    <script src="{% static "blog/js/pages/post_list.js" %}" type="module" defer></script>
-    <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+    <script src="{% static 'blog/js/pages/post_list.js' %}" type="module" defer></script>
+    <script src="{% static 'blog/js/favorites.js' %}" type="module" defer></script>
+    <script>
+        function createStars() {
+            const heroSection = document.querySelector('.hero-section');
+            if (!heroSection) return;
+            
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                const size = Math.random() * 3 + 1;
+                const x = Math.random() * 100;
+                const y = Math.random() * 100;
+                const duration = Math.random() * 3 + 2;
+                const opacity = Math.random() * 0.7 + 0.3;
+                
+                star.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}%;
+                    top: ${y}%;
+                    --duration: ${duration}s;
+                    --opacity: ${opacity};
+                `;
+                
+                heroSection.querySelector('.hero-background').appendChild(star);
+            }
+            
+            // Создание падающих звезд
+            for (let i = 0; i < 5; i++) {
+                const shootingStar = document.createElement('div');
+                shootingStar.className = 'shooting-star';
+                
+                const duration = Math.random() * 5 + 3;
+                const delay = Math.random() * 10;
+                
+                shootingStar.style.cssText = `
+                    --duration: ${duration}s;
+                    --delay: ${delay}s;
+                `;
+                
+                heroSection.querySelector('.hero-background').appendChild(shootingStar);
+            }
+        }
+
+        // Переключатель темы
+        function initThemeToggle() {
+            const toggle = document.getElementById('themeToggle');
+            if (!toggle) return;
+            
+            const html = document.documentElement;
+            const icon = toggle.querySelector('i');
+            
+            // Проверяем сохраненную тему
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            html.setAttribute('data-theme', savedTheme);
+            updateIcon(savedTheme);
+            
+            toggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateIcon(newTheme);
+            });
+            
+            function updateIcon(theme) {
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+        }
+
+        // Кнопка наверх
+        function initScrollTop() {
+            const btn = document.getElementById('scrollTop');
+            if (!btn) return;
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            });
+            
+            btn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // *** РАБОЧИЕ ФИЛЬТРЫ ***
+        function initFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const loadingBar = document.getElementById('filterLoading');
+            const postsContainer = document.getElementById('postsContainer');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    
+                    const filter = btn.dataset.filter;
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('filter', filter);
+                    
+                    // Показываем загрузку
+                    loadingBar.classList.add('active');
+                    
+                    // Обновляем URL без перезагрузки
+                    window.history.pushState({}, '', url);
+                    
+                    // Обновляем активный класс у кнопок
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    try {
+                        // Загружаем новые посты
+                        const response = await fetch(`/posts/load-more/?offset=0&filter=${filter}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        const html = await response.text();
+                        
+                        // Парсим новые посты из ответа
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newPosts = doc.getElementById('postsContainer');
+                        
+                        if (newPosts && postsContainer) {
+                            // Анимация исчезновения старых постов
+                            postsContainer.style.opacity = '0';
+                            postsContainer.style.transform = 'translateY(20px)';
+                            
+                            setTimeout(() => {
+                                postsContainer.innerHTML = newPosts.innerHTML;
+                                
+                                // Анимация появления новых
+                                postsContainer.style.opacity = '1';
+                                postsContainer.style.transform = 'translateY(0)';
+                                
+                                // Обновляем статистику
+                                updateStats(doc);
+                            }, 300);
+                        }
+                        
+                        // Обновляем счетчики в hero-секции
+                        updateHeroStats(doc);
+                        
+                    } catch (error) {
+                        console.error('Filter error:', error);
+                    } finally {
+                        // Скрываем загрузку
+                        loadingBar.classList.remove('active');
+                    }
+                });
+            });
+        }
+
+        // Обновление статистики в карточках
+        function updateStats(doc) {
+            const stats = {
+                totalViews: doc.querySelector('[data-stat="views"]')?.textContent,
+                totalLikes: doc.querySelector('[data-stat="likes"]')?.textContent,
+                totalFavorites: doc.querySelector('[data-stat="favorites"]')?.textContent
+            };
+            
+            Object.entries(stats).forEach(([key, value]) => {
+                const element = document.querySelector(`[data-stat="${key}"]`);
+                if (element && value) {
+                    element.textContent = value;
+                    element.classList.add('updated');
+                    setTimeout(() => element.classList.remove('updated'), 500);
+                }
+            });
+        }
+
+        // Обновление hero-статистики
+        function updateHeroStats(doc) {
+            const heroStats = {
+                posts: doc.querySelector('.hero-stats .stat-item:first-child .stat-number')?.textContent,
+                authors: doc.querySelector('.hero-stats .stat-item:nth-child(2) .stat-number')?.textContent,
+                comments: doc.querySelector('.hero-stats .stat-item:nth-child(3) .stat-number')?.textContent,
+                stars: doc.querySelector('.hero-stats .stat-item:nth-child(4) .stat-number')?.textContent
+            };
+            
+            document.querySelectorAll('.hero-stats .stat-item').forEach((item, index) => {
+                const key = Object.keys(heroStats)[index];
+                const value = heroStats[key];
+                
+                if (value) {
+                    const numberElement = item.querySelector('.stat-number');
+                    if (numberElement) {
+                        // Анимированное обновление числа
+                        animateNumber(numberElement, parseInt(numberElement.textContent), parseInt(value));
+                    }
+                }
+            });
+        }
+
+        // Анимация чисел
+        function animateNumber(element, start, end) {
+            const duration = 1000;
+            const steps = 60;
+            const increment = (end - start) / steps;
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, duration / steps);
+        }
+
+        // Обработка popstate (кнопки назад/вперед)
+        window.addEventListener('popstate', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const filter = urlParams.get('filter') || 'all';
+            
+            // Активируем соответствующую кнопку
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Перезагружаем посты
+            loadPostsForFilter(filter);
+        });
+
+        // Загрузка постов для фильтра
+        async function loadPostsForFilter(filter) {
+            const loadingBar = document.getElementById('filterLoading');
+            const postsContainer = document.getElementById('postsContainer');
+            
+            loadingBar.classList.add('active');
+            
+            try {
+                const response = await fetch(`/posts/load-more/?offset=0&filter=${filter}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newPosts = doc.getElementById('postsContainer');
+                
+                if (newPosts && postsContainer) {
+                    postsContainer.innerHTML = newPosts.innerHTML;
+                    updateStats(doc);
+                }
+            } catch (error) {
+                console.error('Load error:', error);
+            } finally {
+                loadingBar.classList.remove('active');
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initThemeToggle();
+            initScrollTop();
+            initFilters();
+            
+            // Подсвечиваем активный фильтр при загрузке
+            const urlParams = new URLSearchParams(window.location.search);
+            const activeFilter = urlParams.get('filter') || 'all';
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === activeFilter) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Анимируем начальные числа
+            animateStats();
+        });
+
+        // Анимация чисел в hero-секции
+        function animateStats() {
+            document.querySelectorAll('.hero-stats .stat-number').forEach(stat => {
+                const target = parseInt(stat.textContent);
+                let current = 0;
+                const increment = target / 50;
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(current);
+                }, 20);
+            });
+        }
+    </script>
 {% endblock scripts %}
 
 {% block content %}
-    <h1 class="text-center">Список постов сайта</h1>
+    <!-- Индикатор загрузки фильтров -->
+    <div id="filterLoading" class="filter-loading"></div>
 
-    {# Отображение постов #}
-    {% if posts %}
-        <div
-            id="postsContainer"
-            class="container"
-            data-initial-offset="{{ posts|length }}"
-            data-has-more="{{ has_more_posts }}"
-            data-batch-size="{{ posts_per_batch }}"
-            data-load-more-url="{% url 'blog:load_more_posts' %}"
-            data-trigger-type="scroll"
-        >
-            {% for post in posts %}
-                {% include 'blog/includes/post_container.html' %}
-            {% endfor %}
+    <!-- Hero секция — галактический уровень -->
+    <section class="hero-section">
+        <div class="hero-background">
+            <div class="nebula nebula-1"></div>
+            <div class="nebula nebula-2"></div>
         </div>
-    {% else %}
-        <p class="text-center">Постов ещё нет. Загляните позже!</p>
-    {% endif %}
-
-    {% if has_more_posts %}
-        <div id="loadingSpinner" class="text-center d-none">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Загрузка...</span>
+        
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-crown me-2"></i>
+                КОСМИЧЕСКИЙ БЛОГ
+            </div>
+            
+            <h1 class="hero-title" data-text="ГАЛАКТИКА">
+                ГАЛАКТИКА<br>ПОСТОВ
+            </h1>
+            
+            <p class="hero-subtitle">
+                Исследуй бескрайние просторы знаний, делись мыслями<br>
+                и находи единомышленников во вселенной идей
+            </p>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_posts|default:"0" }}</span>
+                    <span class="stat-label">Постов</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_authors|default:"0" }}</span>
+                    <span class="stat-label">Авторов</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_comments|default:"0" }}</span>
+                    <span class="stat-label">Комментариев</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">{{ total_favorites|default:"0" }}</span>
+                    <span class="stat-label">В избранном</span>
+                </div>
             </div>
         </div>
+    </section>
+
+    <!-- Фильтры с РАБОЧИМИ ссылками -->
+    <div class="filters-section">
+        <div class="filters-wrapper">
+            <button class="filter-btn {% if current_filter == 'all' %}active{% endif %}" 
+                    data-filter="all">
+                <i class="fas fa-rocket"></i>
+                Все
+            </button>
+            <button class="filter-btn {% if current_filter == 'trending' %}active{% endif %}" 
+                    data-filter="trending">
+                <i class="fas fa-fire"></i>
+                В тренде
+            </button>
+            <button class="filter-btn {% if current_filter == 'popular' %}active{% endif %}" 
+                    data-filter="popular">
+                <i class="fas fa-star"></i>
+                Популярное
+            </button>
+            <button class="filter-btn {% if current_filter == 'new' %}active{% endif %}" 
+                    data-filter="new">
+                <i class="fas fa-sparkles"></i>
+                Новое
+            </button>
+            {% if user.is_authenticated %}
+            <button class="filter-btn {% if current_filter == 'following' %}active{% endif %}" 
+                    data-filter="following">
+                <i class="fas fa-users"></i>
+                Мои подписки
+                {% if user_following %}
+                <span class="badge bg-primary ms-2">{{ user_following }}</span>
+                {% endif %}
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Статистика на странице с data-атрибутами -->
+    {% if posts %}
+    <div class="page-stats">
+        <div class="stat-card-mini">
+            <div class="stat-icon-mini">
+                <i class="fas fa-eye"></i>
+            </div>
+            <div class="stat-info-mini">
+                <h4 data-stat="views">{{ total_views|default:"0" }}</h4>
+                <p>Всего просмотров</p>
+            </div>
+        </div>
+        
+        <div class="stat-card-mini">
+            <div class="stat-icon-mini">
+                <i class="fas fa-heart"></i>
+            </div>
+            <div class="stat-info-mini">
+                <h4 data-stat="likes">{{ total_likes|default:"0" }}</h4>
+                <p>Лайков</p>
+            </div>
+        </div>
+        
+
+    </div>
+    {% endif %}
+
+    <!-- Основной контент -->
+    <div class="container">
+        {% if posts %}
+            <div 
+                id="postsContainer"
+                class="posts-container"
+                data-initial-offset="{{ posts|length }}"
+                data-has-more="{{ has_more_posts }}"
+                data-batch-size="{{ posts_per_batch }}"
+                data-load-more-url="{% url 'blog:load_more_posts' %}"
+                data-trigger-type="scroll"
+            >
+                {% for post in posts %}
+                    <div class="card-enter" style="--order: {{ forloop.counter0 }};">
+                        {% include 'blog/includes/post_container.html' with post=post %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            {% if has_more_posts %}
+                <div id="loadingSpinner">
+                    <div class="cosmic-spinner">
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring"></div>
+                    </div>
+                    <div class="spinner-text">
+                        ЗАГРУЗКА НОВЫХ МИРОВ...
+                    </div>
+                </div>
+            {% endif %}
+
+        {% else %}
+            <!-- Космическое пустое состояние -->
+            <div class="empty-state">
+                <div class="empty-content">
+                    <div class="empty-galaxy">
+                        <i class="fas fa-galaxy"></i>
+                    </div>
+                    <h2 class="empty-title">Космос ждёт своего исследователя</h2>
+                    <p class="empty-text">
+                        Здесь пока нет ни одного поста. Будь первым, кто зажжёт новую звезду<br>
+                        в этой галактике знаний!
+                    </p>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'blog:post_create' %}" class="empty-btn">
+                            <i class="fas fa-pen-fancy me-2"></i>
+                            СОЗДАТЬ ПОСТ
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="empty-btn">
+                            <i class="fas fa-rocket me-2"></i>
+                            ПРИСОЕДИНИТЬСЯ
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Кнопка наверх -->
+    <button id="scrollTop" class="scroll-top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Переключатель темы -->
+    <button id="themeToggle" class="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Подвал с дополнительной информацией -->
+    {% if posts %}
+    <footer style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+        <p>
+            <i class="fas fa-crown me-2"></i>
+            Ты достиг края галактики. Хочешь увидеть больше?
+        </p>
+    </footer>
     {% endif %}
 {% endblock content %}

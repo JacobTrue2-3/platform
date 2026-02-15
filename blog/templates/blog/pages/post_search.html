@@ -7,48 +7,259 @@
 
 {% block styles %}
   <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
+  <style>
+    /* Дополнительные стили для страницы поиска */
+    .search-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 3rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0 0 50px 50px;
+    }
+
+    .search-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      background: white;
+      border-radius: 50px;
+      padding: 0.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .search-input {
+      border: none;
+      outline: none;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background: transparent;
+    }
+
+    .search-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 50px;
+      padding: 0.75rem 2rem;
+      color: white;
+      font-weight: 600;
+      transition: transform 0.2s;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .filter-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .filter-option input[type="checkbox"] {
+      width: 1.2rem;
+      height: 1.2rem;
+      cursor: pointer;
+    }
+
+    .reset-btn {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.5rem 1.5rem;
+      color: #475569;
+      transition: all 0.2s;
+    }
+
+    .reset-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .results-header {
+      background: #f8fafc;
+      border-radius: 15px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 2rem;
+      border-left: 4px solid #667eea;
+    }
+
+    .results-count {
+      font-size: 1.1rem;
+      color: #334155;
+    }
+
+    .results-count strong {
+      color: #667eea;
+      font-size: 1.3rem;
+    }
+
+    .empty-results {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: #f8fafc;
+      border-radius: 30px;
+    }
+
+    .empty-results i {
+      font-size: 4rem;
+      color: #94a3b8;
+      margin-bottom: 1rem;
+    }
+
+    .empty-results h3 {
+      color: #334155;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-results p {
+      color: #64748b;
+    }
+  </style>
 {% endblock styles %}
 
 {% block scripts %}
-    <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+  <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
+  <script>
+    // Добавляем обработчик для кнопки очистки
+    document.addEventListener('DOMContentLoaded', function() {
+      const resetBtn = document.querySelector('button[type="reset"]');
+      const searchForm = document.querySelector('form');
+      
+      if (resetBtn) {
+        resetBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          // Очищаем все поля формы
+          const inputs = searchForm.querySelectorAll('input[type="text"], input[type="checkbox"]');
+          inputs.forEach(input => {
+            if (input.type === 'checkbox') {
+              input.checked = false;
+            } else {
+              input.value = '';
+            }
+          });
+          // Отправляем форму для сброса результатов
+          searchForm.submit();
+        });
+      }
+    });
+  </script>
 {% endblock scripts %}
 
 {% block content %}
-  <h1>Поиск постов</h1>
-
-  {% comment %} method="GET" Указывать необязательно {% endcomment %}
-  <form>
-    <input type="text" name="search" placeholder="Введите запрос" value="{{ request.GET.search }}">
-
-    <label>
-      <input type="checkbox" name="search_category" {% if request.GET.search_category %}checked{% endif %}>
-      Искать в категориях
-    </label>
-
-    <label>
-      <input type="checkbox" name="search_tag" {% if request.GET.search_tag %}checked{% endif %}>
-      Искать в тегах
-    </label>
-
-    <button type="submit">Найти</button>
-    <button type="reset">Очистить</button>
-  </form>
-
-  {% if search_performed %}
-    {% if posts %}
-      <h2>Найден(-о) {{ paginator.count }} пост(-а, -ов):</h2>
+  <!-- Шапка поиска -->
+  <div class="search-header">
+    <div class="container search-container">
+      <h1 class="text-center mb-4">Поиск постов</h1>
       
-      {% for post in posts %}
-        <div class="container">
-          {% include 'blog/includes/post_container.html' %}
-        </div>
-      {% endfor %}
+      <!-- Форма поиска -->
+      <form class="search-box d-flex align-items-center">
+        <input 
+          type="text" 
+          name="search" 
+          class="search-input flex-grow-1"
+          placeholder="Что ищем? Посты, категории, теги..." 
+          value="{{ request.GET.search }}"
+          autofocus
+        >
+        <button type="submit" class="search-btn">
+          <i class="bi bi-search me-2"></i>Найти
+        </button>
+      </form>
+    </div>
+  </div>
 
-      {% include "blog/includes/pagination.html" %}
+  <div class="container">
+    <!-- Блок фильтров -->
+    <div class="filter-card">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <div class="d-flex gap-4 flex-wrap">
+            <label class="filter-option">
+              <input type="checkbox" name="search_category" {% if request.GET.search_category %}checked{% endif %}>
+              <span>Искать в категориях</span>
+            </label>
+            
+            <label class="filter-option">
+              <input type="checkbox" name="search_tag" {% if request.GET.search_tag %}checked{% endif %}>
+              <span>Искать в тегах</span>
+            </label>
+          </div>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <button type="reset" class="reset-btn">
+            <i class="bi bi-arrow-counterclockwise me-2"></i>Очистить фильтры
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Результаты поиска -->
+    {% if search_performed %}
+      {% if posts %}
+        <!-- Заголовок с количеством результатов -->
+        <div class="results-header d-flex justify-content-between align-items-center">
+          <div class="results-count">
+            <i class="bi bi-files me-2"></i>
+            Найдено <strong>{{ paginator.count }}</strong> 
+            {% with count=paginator.count %}
+              {% if count == 1 %}пост{% elif count >= 2 and count <= 4 %}поста{% else %}постов{% endif %}
+            {% endwith %}
+          </div>
+          {% if request.GET.search %}
+            <div class="text-secondary">
+              <i class="bi bi-search me-1"></i>
+              "{{ request.GET.search }}"
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Список постов -->
+        <div class="posts-list">
+          {% for post in posts %}
+            <div class="mb-4">
+              {% include 'blog/includes/post_container.html' %}
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% include "blog/includes/pagination.html" %}
+      {% else %}
+        <!-- Пустой результат -->
+        <div class="empty-results">
+          <i class="bi bi-file-earmark-x"></i>
+          <h3>Ничего не найдено</h3>
+          <p class="mb-3">По вашему запросу "{{ request.GET.search }}" ничего не найдено</p>
+          <div class="text-secondary">
+            <small>Попробуйте изменить запрос или снять фильтры</small>
+          </div>
+        </div>
+      {% endif %}
     {% else %}
-      <p>По вашему запросу ничего не найдено.</p>
+      <!-- Начальное состояние -->
+      <div class="empty-results">
+        <i class="bi bi-arrow-up-circle"></i>
+        <h3>Введите запрос для поиска</h3>
+        <p class="text-secondary">
+          Можно искать по заголовкам, тексту постов, категориям и тегам
+        </p>
+        <div class="d-flex justify-content-center gap-4 mt-4 text-secondary small">
+          <span><i class="bi bi-tag me-1"></i>Теги</span>
+          <span><i class="bi bi-folder me-1"></i>Категории</span>
+          <span><i class="bi bi-file-text me-1"></i>Текст</span>
+        </div>
+      </div>
     {% endif %}
-  {% else %}
-    <p>Введите запрос для поиска постов</p>
-  {% endif %}
+  </div>
 {% endblock content %}

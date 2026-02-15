@@ -1,44 +1,189 @@
 {% extends "layouts/base.html" %}
+{% load static %}
 
 {% block title %}{{ title }}{% endblock title %}
 
 {% block content %}
-    <h1 class="text-center">{{ title }}</h1>
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <!-- Заголовок -->
+            <h1 class="text-center mb-4">{{ title }}</h1>
 
-    {% comment %} action="{% url '' %}" можно не указывать {% endcomment %}
-    <form method="POST" enctype="multipart/form-data" novalidate>
-        {% csrf_token %}
-        
-        <div>
-            {{ form.title.label_tag }}
-            {{ form.title }}
-            {{ form.title.errors }}
+            <!-- Карточка формы -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Заголовок -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.title.label }}
+                                {% if form.title.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.title.help_text %}
+                                <div class="form-text">{{ form.title.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Категория -->
+                        <div class="mb-3">
+                            <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.category.label }}
+                                {% if form.category.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.category }}
+                            {% if form.category.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.category.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Теги -->
+                        <div class="mb-3">
+                            <label for="{{ form.tags_input.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.tags_input.label }}
+                                {% if form.tags_input.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.tags_input }}
+                            {% if form.tags_input.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.tags_input.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.tags_input.help_text %}
+                                <div class="form-text">{{ form.tags_input.help_text }}</div>
+                            {% else %}
+                                <div class="form-text">Введите теги через запятую</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Текст поста -->
+                        <div class="mb-3">
+                            <label for="{{ form.text.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.text.label }}
+                                {% if form.text.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            {{ form.text }}
+                            {% if form.text.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.text.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Изображение -->
+                        <div class="mb-4">
+                            <label for="{{ form.image.id_for_label }}" class="form-label fw-semibold">
+                                {{ form.image.label }}
+                                {% if form.image.field.required %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            
+                            <!-- Превью изображения (если редактирование и есть изображение) -->
+                            {% if form.instance.pk and form.instance.image %}
+                                <div class="mb-2">
+                                    <img src="{{ form.instance.image.url }}" alt="Текущее изображение" class="img-thumbnail" style="max-height: 150px;">
+                                </div>
+                            {% endif %}
+                            
+                            {{ form.image }}
+                            {% if form.image.errors %}
+                                <div class="text-danger small mt-1">
+                                    {{ form.image.errors }}
+                                </div>
+                            {% endif %}
+                            {% if form.image.help_text %}
+                                <div class="form-text">{{ form.image.help_text }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">
+                                <i class="bi bi-check-lg me-1"></i>{{ submit_button_text }}
+                            </button>
+                            
+                            {% if form.instance.pk %}
+                                <a href="{% url 'blog:post_detail' form.instance.slug %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                            {% else %}
+                                <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Дополнительная информация -->
+            <div class="text-center mt-3">
+                <small class="text-secondary">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Поля со звездочкой (<span class="text-danger">*</span>) обязательны для заполнения
+                </small>
+            </div>
         </div>
-
-        <div>
-            {{ form.category.label_tag }}
-            {{ form.category }}
-            {{ form.category.errors }}
-        </div>
-
-        <div>
-            {{ form.tags_input.label_tag }}
-            {{ form.tags_input }}
-            {{ form.tags_input.errors }}
-        </div>
-
-        <div>
-            {{ form.text.label_tag }}
-            {{ form.text }}
-            {{ form.text.errors }}
-        </div>
-
-        <div>
-            {{ form.image.label_tag }}
-            {{ form.image }}
-            {{ form.image.errors }}
-        </div>
-
-        <button type="submit">{{ submit_button_text }}</button>
-    </form>
+    </div>
+</div>
 {% endblock content %}
+
+{% block extra_css %}
+<style>
+    /* Стили для полей формы */
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 12px;
+        border: 1px solid #dee2e6;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    /* Стили для текстового поля */
+    textarea.form-control {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    /* Стили для ошибок */
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 5px 0 0;
+        color: #dc3545;
+        font-size: 0.875rem;
+    }
+
+    /* Стили для поля загрузки файла */
+    input[type="file"] {
+        padding: 8px;
+        background-color: #f8f9fa;
+        border: 1px dashed #dee2e6;
+        cursor: pointer;
+    }
+
+    input[type="file"]:hover {
+        background-color: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    /* Стили для disabled полей */
+    .form-control:disabled, .form-select:disabled {
+        background-color: #e9ecef;
+        opacity: 0.8;
+    }
+</style>
+{% endblock extra_css %}
