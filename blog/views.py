@@ -11,7 +11,8 @@ class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
     context_object_name = 'posts'
-    queryset = Post.objects.filter(status="published")
+    queryset = Post.objects.filter(status="published").order_by('-created_at')
+    paginate_by = 5
 
 
 class CategoryPostsView(ListView):
