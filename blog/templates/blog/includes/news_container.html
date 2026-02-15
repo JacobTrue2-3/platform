@@ -1,0 +1,115 @@
+<div class="news-card card border-0 shadow-sm mb-4 {% if news_post.news_item.pinned %}news-pinned{% endif %}">
+  <div class="card-header bg-transparent border-0 pb-0">
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <div class="news-badges">
+        {% if news_post.news_item.pinned %}
+          <span class="badge bg-dark text-white me-2">
+            <i class="bi bi-pin-angle-fill me-1"></i>Закреплено
+          </span>
+        {% endif %}
+        {% if news_post.news_item.is_important %}
+          <span class="badge bg-danger me-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>Важно
+          </span>
+        {% endif %}
+        <span class="badge news-type-badge 
+          {% if news_post.news_item.news_type == 'announcement' %}bg-primary
+          {% elif news_post.news_item.news_type == 'update' %}bg-info
+          {% elif news_post.news_item.news_type == 'event' %}bg-success
+          {% elif news_post.news_item.news_type == 'maintenance' %}bg-warning text-dark{% endif %}">
+          <i class="bi 
+            {% if news_post.news_item.news_type == 'announcement' %}bi-patch-exclamation
+            {% elif news_post.news_item.news_type == 'update' %}bi-arrow-up-circle
+            {% elif news_post.news_item.news_type == 'event' %}bi-calendar-event
+            {% elif news_post.news_item.news_type == 'maintenance' %}bi-tools{% endif %}
+            me-1"></i>
+          {{ news_post.news_item.get_news_type_display }}
+        </span>
+      </div>
+      <small class="news-date">
+        <i class="bi bi-clock me-1"></i>
+        <span class="date-field">{{ news_post.created_at|date:"c" }}</span>
+      </small>
+    </div>
+    
+    <!-- Заголовок -->
+    <h4 class="news-title card-title mb-3">
+      <a href="{% url 'blog:post_detail' post_slug=news_post.slug %}" class="text-decoration-none">
+        {{ news_post.title }}
+      </a>
+    </h4>
+  </div>
+
+  <div class="card-body pt-0">
+    <div class="news-content">
+      <!-- Изображение (если есть) -->
+      {% if news_post.image %}
+      <div class="news-image mb-3">
+        <img
+          src="{{ news_post.image.url }}"
+          alt="{{ news_post.title }}"
+          class="img-fluid rounded-3 shadow-sm"
+        >
+      </div>
+      {% endif %}
+
+      <!-- Текст -->
+      <div class="news-text mb-3">
+        <p class="card-text lh-base">
+          {{ news_post.text|truncatechars:500 }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Автор и дата последнего обновления -->
+    <div class="news-meta mb-3">
+      <div class="d-flex align-items-center">
+        <div class="news-author me-3">
+          <a href="{% url 'users:profile' news_post.author.username %}" class="text-decoration-none fw-medium">
+            <i class="bi bi-person-circle"></i>
+            {{ news_post.author.username }}
+          </a>
+        </div>
+        <div class="news-updated">
+          <i class="bi bi-arrow-repeat me-1"></i>
+          Дата последнего обновления: <span class="date-field">{{ news_post.updated_at|date:"c" }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="news-footer d-flex justify-content-between align-items-center pt-3">
+      <div class="news-stats d-flex gap-4">
+        <span>
+          <i class="bi bi-eye me-1"></i>
+          <span class="fw-medium">{{ news_post.views }}</span>
+        </span>
+        <span>
+          <i class="bi bi-chat me-1"></i>
+          <span class="fw-medium">{{ news_post.comments.count }}</span>
+        </span>
+      </div>
+      
+      <div class="news-actions d-flex gap-2 align-items-center">
+        <!-- Теги (если есть) -->
+        {% if news_post.tags.all %}
+        <div class="news-tags">
+          {% for tag in news_post.tags.all %}
+            <span class="badge me-1">
+              #{{ tag.name }}
+            </span>
+          {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Кнопка ("Подробнее") -->
+        <a
+          href="{% url 'blog:post_detail' post_slug=news_post.slug %}" 
+          class="btn btn-primary btn-sm rounded-pill px-3"
+        >
+          <i class="bi bi-book"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

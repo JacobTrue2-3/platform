@@ -18,6 +18,7 @@ class Post(models.Model):
         'Category',
         related_name='posts',
         on_delete=models.CASCADE,
+        null=True,
         verbose_name="Категория"
     )
     tags = models.ManyToManyField("Tag", related_name='posts', blank=True, verbose_name='Теги')
@@ -59,6 +60,41 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         self.slug = slugify(unidecode(self.title))
 
+        super().save(*args, **kwargs)
+
+
+class News(models.Model):
+    post_item = models.OneToOneField(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='news_item',
+        verbose_name="Пост новости"
+    )
+    is_important = models.BooleanField(verbose_name="Важная новость")
+    news_type = models.CharField(
+        choices=[
+            ('announcement', 'Анонс'),
+            ('update', 'Обновление'),
+            ('event', 'Событие'),
+            ('maintenance', 'Техработы'),
+        ],
+        verbose_name="Тип новости"
+    )
+    pinned = models.BooleanField(verbose_name="Закрепленная новость")
+    email_notifications_sent = models.BooleanField(default=False, verbose_name="Email-уведомления отправлены")
+    
+    class Meta:
+        verbose_name = 'Новость'
+        verbose_name_plural = "Новости"
+        db_table = "blog_news"
+
+    def __str__(self):
+        return f"{self.post_item.title}"
+
+    def save(self, *args, **kwargs):
+        # Если новость закрепляется, снимаем закрепление с других новостей
+        if self.pinned and self.post_item.status == "published":
+            News.objects.filter(pinned=True).exclude(id=self.id).update(pinned=False)
         super().save(*args, **kwargs)
 
 

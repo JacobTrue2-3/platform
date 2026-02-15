@@ -18,5 +18,6 @@ urlpatterns = [
     path('posts/<int:post_id>/toggle-favorite/', views.PostFavoriteToggleView.as_view(), name="post_favorite_toggle"),
     path("posts/<int:post_id>/comments/add/", views.AddCommentView.as_view(), name="add_comment"),
     path('posts/<int:post_id>/comments/load-more/', views.LoadMoreCommentsView.as_view(), name="load_more_comments"),
+    path('news/important/toggle-subscription/', views.ToggleImportantNewsSubscriptionView.as_view(), name='toggle_important_news_subscription'),
     path('', views.MainPageView.as_view(), name='main_page'),
 ]

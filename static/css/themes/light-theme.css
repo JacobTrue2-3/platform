@@ -5,4 +5,16 @@ body[data-bs-theme="light"] {
   --footer-border-color: #f59e0b;
 
   --avatar-accent-color: #ff6b6b;
+
+  --news-bg: linear-gradient(145deg, #ffffff, #f8f9fa);
+  --news-bg-pinned: linear-gradient(145deg, #fffbf0, #fef9e7);
+  --news-border: rgba(0,0,0,0.08);
+  --news-text-primary: #2c3e50;
+  --news-text-secondary: #6c757d;
+  --news-text-muted: #6c757d;
+  --news-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  --news-tag-bg: #f8f9fa;
+  --news-tag-text: #212529;
+  --news-tag-border: #dee2e6;
+  --news-date-bg: rgba(0,0,0,0.05);
 }

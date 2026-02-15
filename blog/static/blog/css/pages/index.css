@@ -1,0 +1,13 @@
+.news-list {
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  background: 
+    linear-gradient(135deg, var(--bs-body-bg) 0%, var(--bs-secondary-bg) 100%),
+    repeating-linear-gradient(45deg, transparent, transparent 10px, var(--bs-border-color) 11px);
+}
+
+.subscription-widget .alert {
+  border: none;
+  border-radius: 8px;
+}
