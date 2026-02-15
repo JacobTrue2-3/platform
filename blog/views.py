@@ -192,7 +192,7 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
 
 class MainPageView(TemplateView):
-    template_name = 'blog/pages/main_page.html'
+    template_name = 'blog/pages/index.html'
 
 
 class PostLikeToggleView(View):
