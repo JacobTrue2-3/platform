@@ -50,27 +50,37 @@
         </div>
 
         <!-- Футер карточки -->
-        <div class="mt-3 pt-3 border-top">
-            <!-- Дата создания -->
-            <small class="text-muted">
-                <i class="bi bi-calendar3 me-1"></i>
-                <span class="date-field">{{ post.created_at|date:"c" }}</span>
-            </small>
+        <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center">
+            <div>
+                <!-- Дата создания -->
+                <small class="text-muted">
+                    <i class="bi bi-calendar3 me-1"></i>
+                    <span class="date-field">{{ post.created_at|date:"c" }}</span>
+                </small>
+                
+                <!-- 🔥 Количество комментариев -->
+                <small class="text-muted ms-3">
+                    <i class="bi bi-chat-text me-1"></i>
+                    {{ post.comments.count }}
+                </small>
+            </div>
 
             <!-- Кнопка избранного -->
-            <button
-                class="btn btn-link pe-0 {% if request.user == post.author %}disabled{% endif %} favorite-btn"
-                data-post-favorite-toggle-url="{% url "blog:post_favorite_toggle" post.id %}"
-                data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
-                data-login-url="{% url 'users:login' %}"
-            >
-                {% if request.user in post.favorites.all %}
-                    <i class="favorite-icon bi bi-bookmark-fill"></i>
-                {% else %}
-                    <i class="favorite-icon bi bi-bookmark"></i>
-                {% endif %}
-            </button>
-            <span class="favorites-count">{{ post.favorites.count }}</span>
+            <div>
+                <button
+                    class="btn btn-link pe-0 {% if request.user == post.author %}disabled{% endif %} favorite-btn"
+                    data-post-favorite-toggle-url="{% url "blog:post_favorite_toggle" post.id %}"
+                    data-is-authenticated="{% if request.user.is_authenticated %}true{% else %}false{% endif %}"
+                    data-login-url="{% url 'users:login' %}"
+                >
+                    {% if request.user in post.favorites.all %}
+                        <i class="favorite-icon bi bi-bookmark-fill"></i>
+                    {% else %}
+                        <i class="favorite-icon bi bi-bookmark"></i>
+                    {% endif %}
+                </button>
+                <span class="favorites-count">{{ post.favorites.count }}</span>
+            </div>
         </div>
     </div>
 </div>
