@@ -30,15 +30,21 @@ class CategoryPostsView(ListView):
         return context
 
 
-def get_tag_posts(request, tag_slug):
-    tag = get_object_or_404(Tag, slug=tag_slug)
-    posts = Post.objects.filter(tags=tag, status='published')
-    
-    context = {
-        'tag': tag,
-        'posts': posts
-    }
-    return render(request, 'blog/tag_posts.html', context)
+class TagPostsView(ListView):
+    model = Post
+    template_name = 'blog/tag_posts.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Post.objects.filter(tags=self.tag, status='published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['tag'] = self.tag
+
+        return context
 
 
 def get_post_detail(request, post_slug):
