@@ -9,28 +9,7 @@
     <form method="POST">
         {% csrf_token %}
 
-        <div>
-            <label for="titleInput">Заголовок поста:</label>
-            <input
-                id="titleInput"
-                name="title"
-                type="text"
-                value="{{ title|default:'' }}"
-                placeholder="заголовок (максимальная длина 200 символов)"
-                required>
-            {% if errors.title %}
-                <div style="color: red;">{{ errors.title }}</div>
-            {% endif %}
-        </div>
-
-        <div>
-            <label for="textInput">Текст поста:</label>
-            <textarea id="textInput" name="text" rows="3">{{ text|default:'' }}</textarea>
-            {% if errors.text %}
-                <div style="color: red;">{{ errors.text }}</div>
-            {% endif %}
-        </div>
-
+        {{ form.as_p }}
         <button type="submit">Создать</button>
     </form>
 {% endblock content %}
