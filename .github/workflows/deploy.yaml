@@ -12,9 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Получаем код из репозитория
-      - uses: actions/checkout@v3
-
       # Деплоим на сервер, подключаемся через SSH
       - name: Deploy
         uses: appleboy/ssh-action@master
