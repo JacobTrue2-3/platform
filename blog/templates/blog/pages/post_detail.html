@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block content %}
-    <a href="{% url 'blog:post_list' %}">&larr;Назад</a>
+    <a href="javascript:history.back()">&larr;Назад</a>
     <h1>Детали поста</h1>
     <h2>Идентификатор поста: {{ post.id }}</h2>
     <h3>{{ post.title }}</h3>
