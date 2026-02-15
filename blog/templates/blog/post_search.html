@@ -25,9 +25,13 @@
 
   {% if search_performed %}
     {% if posts %}
+      <h2>Найден(-о) {{ paginator.count }} пост(-а, -ов):</h2>
+      
       {% for post in posts %}
         {% include 'blog/includes/post_container_include.html' %}
       {% endfor %}
+
+      {% include "blog/includes/pagination_include.html" %}
     {% else %}
       <p>По вашему запросу ничего не найдено.</p>
     {% endif %}

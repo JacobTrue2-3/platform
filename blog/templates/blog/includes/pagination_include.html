@@ -5,7 +5,10 @@
             {# Первая #}
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page=1">Первая</a>
+                    <a class="page-link"
+                        href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                        Первая
+                    </a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -16,7 +19,10 @@
             {# Назад #}
             {% if page_obj.has_previous %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Назад</a>
+                    <a class="page-link"
+                        href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                        Назад
+                    </a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -26,7 +32,10 @@
 
             {# Всегда отображаем первую страницу #}
             <li class="page-item {% if page_obj.number == 1 %}active{% endif %}">
-                <a class="page-link" href="?page=1">1</a>
+                <a class="page-link"
+                    href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                    1
+                </a>
             </li>
 
             {# Многоточие перед серединой #}
@@ -43,7 +52,10 @@
                         </li>
                     {% elif num > page_obj.number|add:-2 and num < page_obj.number|add:2 %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            <a class="page-link"
+                                href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                                {{ num }}
+                            </a>
                         </li>
                     {% endif %}
                 {% endif %}
@@ -56,13 +68,19 @@
 
             {# Всегда отображаем последнюю страницу #}
             <li class="page-item {% if page_obj.number == paginator.num_pages %}active{% endif %}">
-                <a class="page-link" href="?page={{ paginator.num_pages }}">{{ paginator.num_pages }}</a>
+                <a class="page-link"
+                    href="?page={{ paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                    {{ paginator.num_pages }}
+                </a>
             </li>
 
             {# Вперёд #}
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Вперёд</a>
+                    <a class="page-link"
+                        href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                        Вперёд
+                    </a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
@@ -73,7 +91,10 @@
             {# Последняя #}
             {% if page_obj.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="?page={{ paginator.num_pages }}">Последняя</a>
+                    <a class="page-link"
+                        href="?page={{ paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.search_category %}&search_category=on{% endif %}{% if request.GET.search_tag %}&search_tag=on{% endif %}">
+                        Последняя
+                    </a>
                 </li>
             {% else %}
                 <li class="page-item disabled">
