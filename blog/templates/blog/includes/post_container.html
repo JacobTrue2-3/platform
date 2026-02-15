@@ -23,6 +23,15 @@
             {% endif %}
         </div>
 
+        <!-- Картинка поста -->
+        {% if post.image %}
+        <div class="mb-3">
+            <img src="{{ post.image.url }}" 
+                alt="{{ post.title }}" 
+                class="img-fluid rounded">
+        </div>
+        {% endif %}
+
         <!-- Категория -->
         <div class="mb-2">
             <span class="text-muted small">Категория:</span>
