@@ -19,9 +19,9 @@
     <script src="{% static 'js/core.js' %}" type="module" defer></script>
     {% block scripts %}{% endblock scripts %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm bg-primary" data-bs-theme="dark">
+        <nav class="navbar navbar-expand-sm rounded-bottom bg-dark" data-bs-theme="dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'blog:main_page' %}">Pikabu</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -64,8 +64,14 @@
             </div>
         </nav>
     </header>
-    <main>{% block content %}{% endblock content %}</main>
-    <footer>&copy;Все права защищены 2025</footer>
+    <main class="flex-grow-1">{% block content %}{% endblock content %}</main>
+    <footer class="bg-dark text-white rounded-top py-3">
+        <div class="container-fluid">
+            <div class="text-center">
+                &copy; Все права защищены 2025
+            </div>
+        </div>
+    </footer>
 
     <button id="scrollToTopBtn" class="scroll-to-top"><i class="bi bi-arrow-up"></i></button>
 
