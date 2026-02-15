@@ -18,9 +18,11 @@
         <h1>Профиль пользователя {{ user.username }}</h1>
     {% endif %}
 
-    <a href="{% url 'users:favorite_posts' user.username %}" class="btn btn-outline-primary">
-        Посмотреть избранные посты
-    </a>
+    {% if user == request.user %}
+        <a href="{% url 'users:favorite_posts' %}" class="btn btn-outline-primary">
+            Посмотреть избранные посты
+        </a>
+    {% endif %}
 
     {% if posts %}
         {% for post in posts %}

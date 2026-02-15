@@ -70,5 +70,4 @@ class FavoritePostsView(ListView):
     paginate_by = 2
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.kwargs['user_username'])
-        return user.favorite_posts.all()
+        return self.request.user.favorite_posts.all()

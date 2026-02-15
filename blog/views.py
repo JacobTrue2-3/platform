@@ -31,6 +31,9 @@ class PostListView(ListView):
 
 class LoadMorePostsView(View):
     def get(self, request):
+        # from time import sleep
+        # sleep(1)
+
         offset = int(request.GET.get("offset"))
         posts_per_batch = PostListView.posts_per_batch
 
