@@ -29,10 +29,8 @@ def create_post(request):
         form = PostForm(request.POST)
 
         if form.is_valid():
-            post = Post.objects.create(
-                title=form.cleaned_data['title'],
-                text=form.cleaned_data['text']
-            )
+            post = form.save()
+            print(post)
 
             return redirect('post_detail', post_id=post.id)
         else:

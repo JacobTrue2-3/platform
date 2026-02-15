@@ -1,21 +1,21 @@
 from django import forms
 
-class PostForm(forms.Form):
-    title = forms.CharField(
-        max_length=200,
-        label='Заголовок поста:',
-        required=False,
-        widget=forms.TextInput(attrs={
-            'placeholder': 'заголовок (максимальная длина 200 символов)'
-        }) # Можно передавать другие атрибуты, например, 'class': 'title-input'
-    )
+from .models import Post
 
-    text = forms.CharField(
-        label="Текст поста:",
-        widget=forms.Textarea(attrs={
-            'rows': 3
-        })
-    )
+
+class PostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'text']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'placeholder': "заголовок (максимальная длина 200 символов)"
+            })
+        }
+        labels = {
+            'title': 'Заголовок поста:',
+            'text': 'Текст поста:'
+        }
 
     def clean_title(self):
         title = self.cleaned_data['title'].strip()
