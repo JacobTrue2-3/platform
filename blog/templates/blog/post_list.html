@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список постов</title>
-</head>
-<body>
+{% extends "base.html" %}
+
+{% block title %}Список постов{% endblock title %}
+
+{% block content %}
     <h1>Список постов сайта</h1>
 
     {# Отображение постов #}
@@ -20,5 +17,4 @@
     {% else %}
         <p>Постов ещё нет. Загляните позже!</p>
     {% endif %}
-</body>
-</html>
+{% endblock content %}

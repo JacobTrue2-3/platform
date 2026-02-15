@@ -1,16 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ post.title }}</title>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }}{% endblock title %}
+
+{% block content %}
     <a href="{% url 'post_list' %}">&larr;Назад</a>
     <h1>Детали поста</h1>
     <h2>Идентификатор поста: {{ post.id }}</h2>
     <h3>{{ post.title }}</h3>
     <p>{{ post.text }}</p>
     <p>{{ post.created_at }}</p>
-</body>
-</html>
+{% endblock content %}
