@@ -11,7 +11,7 @@
 
         <!-- Блок цитаты для ответов -->
         {% if comment.parent %}
-        <div class="mb-2 p-2 bg-light border rounded">
+        <div class="mb-2 p-2 border rounded">
             <small class="text-muted">
                 <i class="bi bi-arrow-return-right"></i>
                 Ответ на комментарий 
@@ -19,7 +19,7 @@
                     {{ comment.parent.author.username }}
                 </a>:
             </small>
-            <blockquote class="mb-0 mt-1 small text-dark">
+            <blockquote class="mb-0 mt-1 small">
                 "{{ comment.parent.text }}"
             </blockquote>
         </div>
@@ -31,7 +31,7 @@
         {% if request.user.is_authenticated %}
         <div class="mt-2">
             <button
-                class="btn btn-sm btn-outline-dark reply-btn" 
+                class="btn btn-sm btn-outline-primary reply-btn" 
                 data-comment-id="{{ comment.id }}"
             >
                 <i class="bi bi-reply"></i> Ответить
@@ -47,7 +47,7 @@
                     <textarea class="form-control form-control-sm" rows="2" placeholder="Ответить {{ comment.author.username }}..."></textarea>
                 </div>
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-dark btn-sm">Отправить</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
                     <button type="button" class="btn btn-danger btn-sm cancel-reply-btn">Отмена</button>
                 </div>
             </form>
