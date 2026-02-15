@@ -43,7 +43,7 @@ class ProfileView(DetailView, MultipleObjectMixin):
     template_name = 'users/pages/profile.html'
     slug_field = 'username'
     slug_url_kwarg = 'user_username'
-    # context_object_name = 'user' Необязательно
+    context_object_name = 'user' # Теперь обязательно
     paginate_by = 5
 
     def get_context_data(self, **kwargs):

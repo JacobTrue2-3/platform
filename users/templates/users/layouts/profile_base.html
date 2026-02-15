@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" href="{% static "users/css/layouts/profile_base.css" %}">
+{% endblock styles %}
+
+{% block content %}
+<div class="profile-container">
+  <!-- Боковое меню -->
+  <aside class="profile-sidebar">
+    <div class="user-info">
+      <div class="avatar">
+        {% if user.avatar %}
+        <img src="{{ user.avatar.url }}" alt="{{ user.username }}">
+        {% else %}
+        <div class="avatar-placeholder">
+          {{ user.username|first|upper }}
+        </div>
+        {% endif %}
+      </div>
+      <h3>{{ user.username }}</h3>
+      <p class="user-email">{{ user.email }}</p>
+    </div>
+
+    <nav class="profile-nav">
+      <ul>
+        <li>
+          <a
+            href="{% url 'users:profile' user_username=user.username %}"
+            class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}"
+          >
+            <i class="bi bi-person me-2"></i>Профиль
+          </a>
+        </li>
+        {% if user == request.user %}
+          <li>
+            <a
+              href="{% url 'users:favorite_posts' %}"
+              class="{% if request.resolver_match.url_name == 'favorite_posts' %}active{% endif %}"
+            >
+              <i class="bi bi-bookmark me-2"></i>Избранное
+            </a>
+          </li>
+        {% endif %}
+        <li>
+          <a href="#" class="coming-soon">
+            <i class="bi bi-gear me-2"></i>Настройки
+          </a>
+        </li>
+        {% if user == request.user %}
+        <li>
+          <form method="POST" action="{% url 'users:logout' %}" class="nav-link-form">
+            {% csrf_token %}
+            <button type="submit" class="nav-link-button">
+              <i class="bi bi-box-arrow-right me-2"></i>Выйти
+            </button>
+          </form>
+        </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Основной контент -->
+  <main class="profile-content">
+    {% block profile_content %}{% endblock profile_content %}
+  </main>
+</div>
+{% endblock content %}

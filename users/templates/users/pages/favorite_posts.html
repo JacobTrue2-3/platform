@@ -1,9 +1,10 @@
-{% extends "layouts/base.html" %}
+{% extends "users/layouts/profile_base.html" %}
 {% load static %}
 
 {% block title %}Избранные посты{% endblock title %}
 
 {% block styles %}
+  {{ block.super }}
   <link rel="stylesheet" href="{% static "blog/css/includes/post_container.css" %}">
 {% endblock styles %}
 
@@ -11,7 +12,7 @@
     <script src="{% static "blog/js/favorites.js" %}" type="module" defer></script>
 {% endblock scripts %}
 
-{% block content %}
+{% block profile_content %}
   <h1 class="text-center">Избранные посты</h1>
 
   <div class="container" data-page-type="favorite-posts">
@@ -23,4 +24,4 @@
 
     {% include "blog/includes/pagination.html" %}
   </div>
-{% endblock content %}
+{% endblock profile_content %}
