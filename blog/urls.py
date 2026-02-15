@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    main_page_view, PostListView, CategoryPostsView, TagPostsView,
+    MainPageView, PostListView, CategoryPostsView, TagPostsView,
     PostDetailView, CreatePostView, PostUpdateView, PostDeleteView
 )
 
@@ -14,5 +14,5 @@ urlpatterns = [
     path('posts/<slug:post_slug>/', PostDetailView.as_view(), name="post_detail"),
     path('posts/category/<slug:category_slug>/', CategoryPostsView.as_view(), name="category_posts"),
     path('posts/tag/<slug:tag_slug>/', TagPostsView.as_view(), name="tag_posts"),
-    path('', main_page_view, name='main_page'),
+    path('', MainPageView.as_view(), name='main_page'),
 ]

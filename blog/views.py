@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 
@@ -113,5 +113,5 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
     success_url = reverse_lazy('blog:post_list')
 
 
-def main_page_view(request):
-    return render(request, template_name='blog/main_page.html')
+class MainPageView(TemplateView):
+    template_name = 'blog/main_page.html'
