@@ -1,4 +1,5 @@
 import { postAction } from "../../../../static/js/utils.js";
+import { formatDate } from "../../../../static/js/format-dates.js";
 
 
 const postReactionsElement = document.querySelector("#postReactions");
@@ -53,66 +54,16 @@ postReactionsElement.addEventListener('click', async (event) => {
 
 
 
-import { formatDate } from "../../../../static/js/format-dates.js";
-
-const commentFormElement = document.getElementById('commentForm');
-commentFormElement.addEventListener('submit', async function(event) {
-  event.preventDefault();
-
-  const formData = new FormData(this);
-  const url = this.dataset.addCommentUrl;
-
-  // Скрываем предыдущие ошибки
-  const commentErrorsElement = document.getElementById('commentErrors');
-  commentErrorsElement.classList.add('d-none');
-  commentErrorsElement.textContent = '';
-
-  try {
-    const data = await postAction(url, formData);
-
-    if (data.success) {
-      // Очищаем текстовое поле
-      this.querySelector('textarea').value = '';
-
-      // Добавляем новый комментарий в начало списка
-      const commentsListElement = document.getElementById('commentsList');
-      const emptyMessageElement = commentsListElement.querySelector('#emptyMessage');
-
-      if (emptyMessageElement) {
-        emptyMessageElement.remove();
-      }
-
-      commentsListElement.insertAdjacentHTML('afterbegin', data.comment_html);
-      
-      const newCommentElement = commentsListElement.firstElementChild;
-      const dateElement = newCommentElement.querySelector('.date-field');
-      formatDate(dateElement);
-
-      // УВЕЛИЧИВАЕМ offset на 1, так как добавили новый комментарий
-      window.commentsBatchLoader.offset += 1;
-
-      // Обновляем счетчик комментариев в заголовке
-      const commentsTitleElement = document.querySelector('#commentsTitle');
-      commentsTitleElement.textContent = `Комментарии (${data.comments_count})`;
-    } else {
-      // Показываем ошибку
-      commentErrorsElement.textContent = data.error;
-      commentErrorsElement.classList.remove('d-none');
-    }
-  } catch (error) {
-    console.error('Ошибка при добавлении комментария:', error);
-    commentErrorsElement.textContent = 'Произошла ошибка при отправке комментария';
-    commentErrorsElement.classList.remove('d-none');
-  }
-});
-
-
-class ReplyManager {
+class CommentManager {
   constructor() {
     this.init();
   }
 
   init() {
+    // Обработчик основной формы комментария
+    const commentFormElement = document.getElementById('commentForm');
+    commentFormElement.addEventListener('submit', (e) => this.handleMainCommentSubmit(e));
+
     // Обработчики для кнопок "Ответить" и "Отмена"
     document.addEventListener('click', (e) => {
       if (e.target.closest('.reply-btn')) {
@@ -131,6 +82,58 @@ class ReplyManager {
         this.handleReplyFormSubmit(e.target.closest('.reply-form'));
       }
     });
+  }
+
+  // Обработчик основной формы комментария
+  async handleMainCommentSubmit(event) {
+    event.preventDefault();
+
+    const formElement = event.target;
+    const formData = new FormData(formElement);
+    const url = formElement.dataset.addCommentUrl;
+
+    // Скрываем предыдущие ошибки
+    const commentErrorsElement = document.getElementById('commentErrors');
+    commentErrorsElement.classList.add('d-none');
+    commentErrorsElement.textContent = '';
+
+    try {
+      const data = await postAction(url, formData);
+
+      if (data.success) {
+        // Очищаем текстовое поле
+        formElement.querySelector('textarea').value = '';
+
+        // Добавляем новый комментарий в начало списка
+        const commentsListElement = document.getElementById('commentsList');
+        const emptyMessageElement = commentsListElement.querySelector('#emptyMessage');
+
+        if (emptyMessageElement) {
+          emptyMessageElement.remove();
+        }
+
+        commentsListElement.insertAdjacentHTML('afterbegin', data.comment_html);
+        
+        const newCommentElement = commentsListElement.firstElementChild;
+        const dateElement = newCommentElement.querySelector('.date-field');
+        formatDate(dateElement);
+
+        // УВЕЛИЧИВАЕМ offset на 1, так как добавили новый комментарий
+        window.commentsBatchLoader.offset += 1;
+
+        // Обновляем счетчик комментариев в заголовке
+        const commentsTitleElement = document.querySelector('#commentsTitle');
+        commentsTitleElement.textContent = `Комментарии (${data.comments_count})`;
+      } else {
+        // Показываем ошибку
+        commentErrorsElement.textContent = data.error;
+        commentErrorsElement.classList.remove('d-none');
+      }
+    } catch (error) {
+      console.error('Ошибка при добавлении комментария:', error);
+      commentErrorsElement.textContent = 'Произошла ошибка при отправке комментария';
+      commentErrorsElement.classList.remove('d-none');
+    }
   }
 
   handleReplyClick(replyBtnElement) {
@@ -189,4 +192,4 @@ class ReplyManager {
   }
 }
 
-new ReplyManager();
+new CommentManager();
