@@ -1,3 +1,6 @@
+# Проект на Django
+
+## Установка зависимостей
 ```bash
 python -m venv venv
 source venv/Scripts/activate
