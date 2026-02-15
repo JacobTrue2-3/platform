@@ -24,6 +24,7 @@
             data-has-more="{{ has_more_posts }}"
             data-batch-size="{{ posts_per_batch }}"
             data-load-more-url="{% url 'blog:load_more_posts' %}"
+            data-trigger-type="scroll"
         >
             {% for post in posts %}
                 {% include 'blog/includes/post_container.html' %}

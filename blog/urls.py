@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     MainPageView, PostListView, LoadMorePostsView, PostSearchView, CategoryPostsView, TagPostsView,
     PostDetailView, CreatePostView, PostUpdateView, PostDeleteView,
-    PostLikeToggleView, PostDislikeToggleView, PostFavoriteToggleView, AddCommentView
+    PostLikeToggleView, PostDislikeToggleView, PostFavoriteToggleView, AddCommentView, LoadMoreCommentsView
 )
 
 app_name = 'blog'
@@ -21,5 +21,6 @@ urlpatterns = [
     path('posts/<int:post_id>/dislike/', PostDislikeToggleView.as_view(), name="post_dislike"),
     path('posts/<int:post_id>/toggle-favorite/', PostFavoriteToggleView.as_view(), name="post_favorite_toggle"),
     path("posts/<int:post_id>/comments/add/", AddCommentView.as_view(), name="add_comment"),
+    path('posts/<int:post_id>/comments/load-more/', LoadMoreCommentsView.as_view(), name="load_more_comments"),
     path('', MainPageView.as_view(), name='main_page'),
 ]

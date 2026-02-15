@@ -1,4 +1,4 @@
-import InfiniteScroll from '../infinite-scroll.js';
+import BatchLoader from '../batch-loader.js';
 
 
-new InfiniteScroll("postsContainer");
+new BatchLoader("postsContainer");

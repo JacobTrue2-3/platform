@@ -88,6 +88,9 @@ commentFormElement.addEventListener('submit', async function(event) {
       const dateElement = newCommentElement.querySelector('.date-field');
       formatDate(dateElement);
 
+      // УВЕЛИЧИВАЕМ offset на 1, так как добавили новый комментарий
+      window.commentsBatchLoader.offset += 1;
+
       // Обновляем счетчик комментариев в заголовке
       const commentsTitleElement = document.querySelector('#commentsTitle');
       commentsTitleElement.textContent = `Комментарии (${data.comments_count})`;

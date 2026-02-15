@@ -5,6 +5,7 @@
 
 {% block scripts %}
     <script src="{% static "blog/js/reactions.js" %}" type="module" defer></script>
+    <script src="{% static "blog/js/pages/post_detail.js" %}" type="module" defer></script>
 {% endblock scripts %}
 
 {% block content %}
@@ -93,13 +94,39 @@
         {% endif %}
 
         <!-- Список комментариев -->
-        <div id="commentsList" class="mt-3">
-            {% for comment in post.comments.all %}
+        <div 
+            id="commentsList"
+            class="mt-3"
+            data-initial-offset="{{ comments|length }}"
+            data-has-more="{{ has_more_comments }}"
+            data-batch-size="{{ comments_per_batch }}"
+            data-load-more-url="{% url 'blog:load_more_comments' post.id %}"
+            data-trigger-type="button"
+            data-load-more-btn-id="loadMoreCommentsBtn"
+        >
+            {% for comment in comments %}
                 {% include 'blog/includes/comment_container.html' %}
             {% empty %}
                 <p id="emptyMessage" class="text-muted">Пока нет комментариев. Будьте первым!</p>
             {% endfor %}
         </div>
+
+        {% if has_more_comments %}
+            <div id="loadingSpinner" class="text-center d-none">
+                <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Кнопка "Загрузить еще" для комментариев -->
+        {% if has_more_comments %}
+            <div class="text-center my-3">
+                <button id="loadMoreCommentsBtn" class="btn btn-outline-dark">
+                    Загрузить еще комментарии
+                </button>
+            </div>
+        {% endif %}
     </div>
     <!-- Конец блока комментариев -->
 {% endblock content %}
