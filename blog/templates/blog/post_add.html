@@ -8,8 +8,30 @@
     {% comment %} action="{% url 'new_post' %}" можно не указывать {% endcomment %}
     <form method="POST">
         {% csrf_token %}
+        
+        {% for field in form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+        {% endfor %}
+        
+        {% comment %}
+        Ещё один вариант
+        <div>
+            {{ form.title.label_tag }}
+            {{ form.title }}
+            {{ form.title.errors }}
+        </div>
 
-        {{ form.as_p }}
+        <div>
+            {{ form.text.label_tag }}
+            {{ form.text }}
+            {{ form.title.errors }}
+        </div>
+        {% endcomment %}
+
         <button type="submit">Создать</button>
     </form>
 {% endblock content %}
