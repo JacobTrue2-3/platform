@@ -35,6 +35,10 @@ jobs:
             # Обновляем зависимости
             pip install -r requirements.txt
 
+            # Создаём и применяем миграции
+            python manage.py makemigrations
+            python manage.py migrate
+
 
             # Создаём файл .env из отдельных секретов
             echo "SECRET_KEY=${{ secrets.ENV_SECRET_KEY }}" > .env
