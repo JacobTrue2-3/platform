@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Post, Category, Tag
 from .forms import PostForm
@@ -52,38 +52,29 @@ class PostDetailView(DetailView):
     template_name = 'blog/post_detail.html'
     # context_object_name = 'post' Необязательно
     slug_url_kwarg = 'post_slug'
-    slug_field = 'slug'
+    slug_field = 'slug' # Необязательно
 
 
-@login_required
-def create_post(request):
-    title = "Создать пост"
-    submit_button_text = 'Создать'
+class CreatePostView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    template_name = 'blog/post_form.html'
+    extra_context = {
+        'title': "Создать пост",
+        'submit_button_text': "Создать"
+    }
 
-    if request.method == "GET":
-        form = PostForm()
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.author = self.request.user
+        post.save()
 
-        return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
-    
-    if request.method == "POST":
-        form = PostForm(request.POST, request.FILES)
+        tags = form.cleaned_data.get('tags_input', [])
+        for tag_name in tags:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            post.tags.add(tag)
 
-        if form.is_valid():
-            post = form.save(commit=False)
-
-            post.author = request.user
-
-            post.save()
-
-            tags = form.cleaned_data.get('tags_input', [])
-            
-            for tag_name in tags:
-                tag, _ = Tag.objects.get_or_create(name=tag_name)
-                post.tags.add(tag)
-
-            return redirect('blog:post_detail', post_slug=post.slug)
-        else:
-            return render(request, 'blog/post_form.html', context={"form": form, 'title': title, 'submit_button_text': submit_button_text})
+        return redirect('blog:post_detail', post_slug=post.slug)
 
 
 def update_post(request, post_id):
