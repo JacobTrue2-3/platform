@@ -11,7 +11,9 @@
 
     {% if posts %}
         {% for post in posts %}
-            {% include 'blog/includes/post_container_include.html' %}
+            {% if user == request.user or post.status != 'draft' %}
+                {% include 'blog/includes/post_container_include.html' %}
+            {% endif %}
         {% endfor %}
     {% else %}
         <p>Постов ещё нет. Загляните позже!</p>
