@@ -5,3 +5,4 @@ django-extensions==4.1
 pillow==11.3.0
 sqlparse==0.5.3
 tzdata==2025.2
+Unidecode==1.4.0

@@ -6,9 +6,9 @@ app_name = 'blog'
 
 urlpatterns = [
     path("posts/", get_post_list, name="post_list"),
-    path('posts/<int:post_id>/', get_post_detail, name="post_detail"),
     path('posts/add/', create_post, name="new_post"),
     path('posts/<int:post_id>/edit/', update_post, name="edit_post"),
     path('posts/<int:post_id>/delete/', delete_post, name="remove_post"),
+    path('posts/<slug:post_slug>/', get_post_detail, name="post_detail"),
     path('', main_page_view, name='main_page'),
 ]
