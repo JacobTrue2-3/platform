@@ -24,6 +24,7 @@ class Post(models.Model):
     text = models.TextField(verbose_name="Текст")
     image = models.ImageField(upload_to="post_images/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата последнего изменения")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts') # можно указать SET_NULL
     status = models.CharField(choices=STATUS_CHOICES, default='draft', verbose_name="Статус")
 
